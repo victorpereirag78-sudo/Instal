@@ -1,0 +1,2501 @@
+/* Estilos Generales */ 
+
+ body, html { 
+    height: 100%; 
+    margin: 0; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+    background-color: #f4f7fa; 
+    color: #333; 
+ } 
+
+ /* --- Pantalla de Login --- */ 
+ #login-container { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: 100%; 
+    background: linear-gradient(180deg, rgb(1, 1, 170) 0%, rgb(71, 75, 71) 100%); 
+ } 
+ .login-box { 
+    padding: 40px; 
+    background: rgba(163, 161, 161, 0.9); 
+    border-radius: 10px; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
+    text-align: center; 
+    width: 320px; 
+ } 
+ .login-box h2 { margin-bottom: 5px; color: black; } 
+ .login-box input { width: calc(100% - 20px); padding: 10px; margin-bottom: 5px; border: 1px solid #ccc; border-radius: 5px; } 
+ .login-box button { width: 100%; padding: 12px; background-color: #0056b3; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; } 
+
+ /* --- App Principal --- */ 
+ #app-container { display: flex; flex-direction: column; height: 100vh; } 
+
+ /* --- Cabecera y Menú Horizontal --- */ 
+ #main-header { display: flex; justify-content: space-between; align-items: center; background-color: #003366; color: white; padding: 0 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); flex-shrink: 0; } 
+ #main-nav button { background: none; border: none; color: white; padding: 15px 20px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; } 
+ #main-nav button:hover, #main-nav button.active { background-color: #004494; } 
+
+ /* --- Contenedor (Sidebar + Contenido) --- */ 
+ #content-wrapper { display: flex; flex-grow: 1; overflow: hidden; } 
+ #sidebar { width: 240px; background-color: #004080; color: white; padding: 15px; flex-shrink: 0; overflow-y: auto; } 
+ #sidebar .submenu { display: none; } 
+ #sidebar .submenu.active { display: block; } 
+ #sidebar h2 { font-size: 1.1em; border-bottom: 1px solid #0056b3; padding-bottom: 10px; margin-top: 0; margin-bottom: 15px; } 
+ #sidebar ul { list-style: none; padding: 0; margin: 0; } 
+ #sidebar ul li button { width: 100%; text-align: left; background: none; border: none; color: #e0e0e0; padding: 12px 10px; cursor: pointer; font-size: 14px; border-radius: 4px; transition: background-color 0.2s, color 0.2s; } 
+ #sidebar ul li button:hover { background-color: #0056b3; color: #ffffff; } 
+ .submenu-group-title { font-size: 0.8em; text-transform: uppercase; color: #a0c0e0; margin: 20px 0 8px 5px; font-weight: bold; } 
+
+ /* --- Área de Contenido Principal --- */ 
+    #main-content { flex-grow: 1; padding: 30px; overflow-y: auto; background-color: #f9fbfd; } 
+    .content-panel { display: none; } 
+    .content-panel.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+ /* --- Estilos para Formularios --- */ 
+    .form-container { background-color: #ffffff; padding: 25px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); max-width: 700px; } 
+    .form-group { margin-bottom: 20px; display: flex; align-items: center; flex-wrap: wrap; } 
+    .form-group label { flex-basis: 160px; margin-right: 15px; font-size: 0.95em; color: rgb(42, 30, 30); font-weight: 600; } 
+    .form-group input[type="text"], .form-group input[type="date"], .form-group input[type="email"], .form-group select, .form-group textarea { flex-grow: 1; max-width: 320px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95em; transition: border-color 0.3s, box-shadow 0.3s; } 
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); } 
+    .form-group input.valid { border-color: #28a745; box-shadow: 0 0 0 3px rgba(40,167,69,0.1); } 
+    .form-group input.invalid { border-color: #dc3545; box-shadow: 0 0 0 3px rgba(220,53,69,0.1); } 
+    .form-group textarea { min-height: 80px; resize: vertical; } 
+    .form-group button { margin-left: 175px; padding: 10px 24px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background-color 0.2s; } 
+    .form-group button:hover { background-color: #0056b3; } 
+
+ /* ===== SECCIÓN DE FILTROS CORREGIDA ===== */
+    .grid-filtros {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    }
+
+    .filtros-container {
+    background-color: #003366;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    margin-bottom: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+.filtro-row {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los filtros pasen a la siguiente línea si no caben */
+    gap: 15px; /* Espacio entre cada filtro */
+    align-items: center; /* Alinea verticalmente label e input */
+}
+
+.filtro-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 140px;
+    max-width: 200px; /* Opcional: evita que se hagan muy anchos */
+}
+
+/*Filtro letras filtros*/
+.filtro-label {
+    font-weight: 600;
+    align-items: center;
+    color: white;
+    font-size: 0.9em;
+    margin-bottom: 50px; /* Eliminamos margen inferior */
+    white-space: nowrap; /* Evita que el texto de la etiqueta se parta */
+}
+.filtro-item {
+    padding: 8px 10px; /* Hacemos los inputs más angostos verticalmente */
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%; /* El input ocupa el espacio disponible en el wrapper */
+    box-sizing: border-box; /* Importante para que el padding no desborde el ancho */
+}
+.filtro-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+.filtro-buscar {
+    flex-grow: 1; /* El campo de búsqueda ocupa el mayor espacio */
+    min-width: 250px;
+}
+.filtro-buscar input {
+    width: 100%;
+    box-sizing: border-box;
+}
+.btn-reset, .btn-excel {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+/* Etiquetas */
+.filtro-wrapper label,
+.filtro-buscar label {
+  font-weight: 600;
+  color: white;
+  font-size: 0.85em;
+}
+
+/* Inputs y selects */
+.filtro-item,
+.filtro-buscar input {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filtro-item:focus,
+.filtro-buscar input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+/* Fila inferior */
+.filtro-actions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.filtro-buscar {
+  flex-grow: 1;
+}
+
+.filtro-botones {
+  display: flex;
+  gap: 10px;
+}
+.btn-reset { background-color: #6c757d; color: white; }
+.btn-reset:hover { background-color: #5a6268; }
+.btn-excel { background-color: #28a745; color: white; }
+.btn-excel:hover { background-color: #218838; }
+
+ /* --- Tablas y Paginación --- */ 
+ .tabla-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 10px; } 
+ table { width: 100%; border-collapse: collapse; min-width: 800px; } 
+ th, td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: left; white-space: nowrap; font-size: 0.9em; } 
+ table thead { position: sticky; top: 0; z-index: 10; }
+ table th { background-color: #002244; color: white; font-weight: 600; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; }
+ #paginacion { margin-top: 25px; display: flex; flex-wrap: wrap; gap: 8px; } 
+ #paginacion button { padding: 8px 14px; border: 1px solid #ddd; background: white; border-radius: 5px; cursor: pointer; transition: all 0.2s; } 
+ #paginacion button:hover:not(.active) { background-color: #f0f0f0; } 
+ #paginacion button.active { background-color: #007bff; color: white; border-color: #007bff; } 
+
+ /* --- Paneles de Búsqueda y Otros --- */ 
+ .resultado-busqueda { margin-top: 20px; padding: 15px; background-color: #e9f7fd; border: 1px solid #b3e0f2; border-radius: 8px; } 
+ #toast-container { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; } 
+ .toast { padding: 14px 20px; border-radius: 8px; color: white; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); animation: slideIn 0.3s ease-out forwards; max-width: 320px; } 
+ .toast.success { background-color: #28a745; } 
+ .toast.error { background-color: #dc3545; } 
+ @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+ .estado-btn { padding: 6px 12px; border: none; border-radius: 20px; color: black; font-weight: 600; font-size: 0.85em; }
+ .estado-btn.finalizado { background-color: #28a745; }
+ .estado-btn.rechazado { background-color: #dc3545; }
+
+ /* --- Estilos para el Formulario de Nuevo Personal (RRHH) --- */
+.form-grid {
+    display: grid;
+    /* Crea dos columnas de tamaño flexible */
+    grid-template-columns: repeat(2, 1fr);
+    /* Espacio entre las filas y columnas del grid */
+    gap: 15px 25px; 
+}
+
+/* Hace que un campo ocupe todo el ancho (las 2 columnas) */
+.form-grid .form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Ajustes para alinear el label y el input dentro del grid */
+.form-grid .form-group {
+    margin-bottom: 0; /* Quitamos el margen que ya no necesitamos */
+    flex-direction: column; /* Ponemos el label arriba del input */
+    align-items: flex-start;
+}
+
+.form-grid .form-group label {
+    margin-bottom: 6px; /* Pequeño espacio entre label e input */
+    margin-right: 0;
+    flex-basis: auto;
+}
+
+.form-grid .form-group input,
+.form-grid .form-group select,
+.form-grid .form-group textarea {
+    width: 100%; /* El input ocupa todo el ancho de su columna */
+    max-width: none;
+}
+
+/* Estilo para el switch de "Activo" */
+.switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
+input:checked + .slider { background-color: #28a745; }
+input:checked + .slider:before { transform: translateX(22px); }
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
+
+/* --- Estilos para Listas de Gestión (Cargos / Dptos) --- */
+.lista-gestion {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+    max-width: 500px;
+}
+
+.lista-gestion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.lista-gestion-item span {
+    font-weight: 500;
+}
+
+.btn-eliminar {
+    padding: 6px 12px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.2s;
+}
+
+.btn-eliminar:hover {
+    background-color: #c82333;
+}
+
+/* styles.css */
+
+.btn-email, .btn-wsp {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+    font-size: 14px;
+    color: white;
+}
+.btn-email { background-color: #007bff; }
+.btn-email:hover { background-color: #0069d9; }
+.btn-wsp { background-color: #25D366; }
+.btn-wsp:hover { background-color: #1EBE57; }
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-estado {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: background-color 0.9s;
+}
+
+.dropdown:hover .btn-estado,
+.dropdown:focus-within .btn-estado {
+  background-color: #0056b3;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  z-index: 1000;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+/* 👇 ESTO ES LO CLAVE: mantener el menú visible al hacer hover SOBRE ÉL */
+.dropdown:focus-within .dropdown-content {
+  display: block;
+}
+
+.dropdown-content.show {
+  display: block !important;
+}
+
+/* 👇 Asegurar que el menú NO desaparezca al pasar el mouse entre el botón y el menú */
+.dropdown-content button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.9s;
+}
+
+.dropdown-content button:hover {
+  background-color: #f1f1f1;
+}
+
+.tabla-container {
+    overflow-x: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 10px;
+    position: relative; /* Para que el z-index funcione */
+    z-index: 1; /* Baja su prioridad */
+}
+
+/* ===== Filtros del Panel de Reportes de Producción ===== */
+
+.filtros-reportes {
+    display: flex;       /* ¡La magia! Pone los elementos hijos (los divs de cada filtro) en una fila. */
+    flex-wrap: wrap;     /* Si no caben en la pantalla, permite que pasen a la línea de abajo. */
+    gap: 16px;           /* Espacio horizontal y vertical entre cada elemento del filtro. */
+    align-items: flex-end; /* Alinea todos los elementos en su base, para que los botones se vean bien junto a los inputs. */
+    padding-bottom: 20px; /* Un poco de espacio extra abajo. */
+    margin-bottom: 20px;  /* Separa los filtros del gráfico. */
+    border-bottom: 1px solid #eee; /* Una línea divisoria sutil para separar. */
+}
+
+/* Estilo para cada grupo (label + input) dentro de los filtros */
+.filtros-reportes > div {
+    display: flex;
+    flex-direction: column; /* Mantiene la etiqueta arriba del input/select. */
+    gap: 6px;               /* Pequeño espacio entre la etiqueta y el campo. */
+}
+
+.filtros-reportes label {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: #555;
+}
+
+.filtros-reportes select,
+.filtros-reportes input,
+.filtros-reportes button {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.filtros-reportes button {
+    cursor: pointer;
+    border: none;
+    color: white;
+    background-color: #6c757d; /* Color base para botones (gris) */
+    transition: background-color 0.2s;
+}
+.filtros-reportes button:hover {
+    background-color: #5a6268;
+}
+
+/* Mantenemos el color verde para el botón de exportar */
+.filtros-reportes button.btn-excel {
+    background-color: #28a745; 
+}
+.filtros-reportes button.btn-excel:hover {
+    background-color: #218838;
+}
+
+/* ===== Layout para Gráfico y Tabla en Reportes ===== */
+.reportes-layout {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.grafico-container {
+    flex: 1 1 35%;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    height: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tabla-container-reporte {
+    flex: 1 1 65%;
+}
+
+#tabla-dinamica-produccion {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+/* Responsive: en pantallas pequeñas se apilan */
+@media (max-width: 1024px) {
+    .reportes-layout {
+        flex-direction: column;
+    }
+    .grafico-container, .tabla-container-reporte {
+        flex: 1 1 100%;
+    }
+}
+
+/* === Estilos para Logística === */
+.mt-3 { margin-top: 20px; }
+.lista-seriados-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+.lista-seriados-item input {
+    flex: 1;
+}
+
+#modulo-bienvenida {
+    transition: opacity 0.3s ease;
+}
+#imagen-modulo {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Estilos del switch (ya lo tienes, pero asegúrate de que no tenga width 100% */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #28a745;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #28a745;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Texto "Activo" al lado del switch */
+.switch span {
+    margin-left: 8px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* ✅ ESTILOS CORREGIDOS PARA LA TABLA DE PERSONAL */
+#tabla-personal .acciones-celda {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    flex-wrap: nowrap !important;
+    min-height: 36px;
+}
+
+#tabla-personal .acciones-celda .btn-editar {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border: 1px solid #ccc;
+    background: #f8f9fa;
+    color: #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+#tabla-personal .acciones-celda .btn-editar:hover {
+    background: #e9ecef;
+    color: #0056b3;
+}
+
+/* Switch alineado en la misma fila */
+#tabla-personal .acciones-celda .switch {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin: 0 !important;
+}
+
+/* Texto "Activo" al lado del switch */
+#tabla-personal .acciones-celda .estado-texto {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 0 !important;
+    white-space: nowrap;
+}
+
+/* Asegurar que el contenedor de la celda no colapse */
+#tabla-personal td:last-child {
+    min-width: 180px;
+    text-align: center;
+}
+
+:root {
+  --color-primary: #003366;
+  --color-primary-dark: #002244;
+  --color-success: #28a745;
+  --color-danger: #dc3545;
+  --color-gray: #6c757d;
+  --border-radius: 8px;
+  --spacing-md: 15px;
+  --spacing-lg: 30px;
+}
+
+@media (max-width: 768px) {
+#sidebar { width: 200px; }
+.form-group label { flex-basis: 120px; }
+.grid-filtros { grid-template-columns: repeat(2, 1fr); }
+}
+
+.btn-link-orden {
+    background: none;
+    border: none;
+    color: rgb(74, 72, 72); /* Color azul para que parezca link */
+    cursor: pointer;
+    font-weight: bold;
+    
+    font-size: 1em;
+}
+.btn-link-orden:hover {
+    color: #0056b3;
+}
+
+/* Estilos del modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5c636a;
+}
+
+/* === ESTILOS PARA EL PANEL DE SALDO TÉCNICO === */
+
+/* Asegurar que el select no tenga padding extra */
+#filtro-tecnico-saldo {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 320px;
+    box-sizing: border-box;
+}
+
+/* Estilo para el dropdown del select (opcional, pero ayuda a controlar su tamaño) */
+#filtro-tecnico-saldo option {
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+
+#saldo-tecnico-container {
+    overflow-y: auto;
+    max-height: calc(100vh - 250px);
+}
+
+/* Ajustar el estilo del texto "Seleccione Técnico" para que no aparezca duplicado */
+#filtro-tecnico-saldo option[value=""] {
+    color: white;
+    font-style: italic;
+}
+
+/* Asegurar que el contenido de detalle-stock no tenga margen superior excesivo */
+#detalle-stock {
+    margin-top: 10px;
+    min-height: 200px; /* Para que siempre ocupe un mínimo de espacio */
+}
+
+/* === CORRECCIÓN ESPECÍFICA PARA EL PANEL DE SALDO TÉCNICO === */
+#panel-saldo-tecnico .form-container {
+    max-width: none; /* ✅ Elimina el límite de 700px */
+    padding: 25px 15px; /* Ajusta el padding lateral para mayor espacio */
+}
+
+/* Asegura que el contenedor del filtro y la tabla usen todo el ancho */
+#panel-saldo-tecnico .filtros-container {
+    width: 45%;
+    justify-content: flex-start; /* Alinea el filtro a la izquierda */
+}
+
+#panel-saldo-tecnico .form-group {
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+/* Asegura que la tabla y los resúmenes también usen el 100% del ancho */
+#panel-saldo-tecnico #resumen-saldo,
+#panel-saldo-tecnico #detalle-stock {
+    width: 100%;
+    padding: 0 15px; /* Alinea con el nuevo padding del contenedor */
+    box-sizing: border-box;
+}
+
+#panel-saldo-tecnico .tabla-container {
+    padding: 10px 0; /* Reduce el padding lateral para maximizar espacio */
+}
+
+/* ✅ ANCHO COMPLETO PARA GESTIÓN DE EQUIPOS */
+#panel-gestion-equipos {
+    width: 95% !important;
+    max-width: none !important;
+    padding: 0 !important;
+}
+
+#panel-gestion-equipos .form-container {
+    max-width: none !important;
+    width: 100% !important;
+    padding: 25px !important;
+}
+
+/* Asegura que la tabla también ocupe todo el ancho */
+#panel-gestion-equipos .tabla-container {
+    overflow: visible !important;
+}
+
+#panel-gestion-equipos table {
+    min-width: 100% !important;
+}
+
+/* ✅ Estilo personalizado para el panel de Gestión Equipos */
+#panel-gestion-equipos .form-container {
+    padding: 30px 40px; /* Más espacio arriba/abajo y en los costados */
+    max-width: 1200px; /* Permite que se expanda más en pantallas grandes */
+    margin: 0 auto; /* Centra el contenedor si no ocupa todo el ancho */
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Espacio entre los botones de crear */
+#panel-gestion-equipos .form-container > div:first-child {
+    margin-bottom: 30px;
+    justify-content: flex-start;
+}
+
+/* Formulario de creación */
+#form-crear-articulo {
+    margin-top: 25px !important;
+    padding-top: 25px !important;
+    border-top: 2px solid #e0e6ed;
+}
+
+/* Mejor espaciado en los inputs */
+#panel-gestion-equipos .form-group {
+    margin-bottom: 24px;
+}
+
+#panel-gestion-equipos .form-group label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+}
+
+#panel-gestion-equipos .form-group input {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+/* Botones del formulario */
+#panel-gestion-equipos .form-group button {
+    margin-left: 0;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+}
+
+/* Estilo de la tabla */
+#tabla-gestion-articulos {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; /* Espacio entre filas */
+}
+
+#tabla-gestion-articulos th,
+#tabla-gestion-articulos td {
+    padding: 14px 16px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+#tabla-gestion-articulos th {
+    background-color: #002244;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: white;
+    text-transform: uppercase;
+    border-radius: 6px 6px 0 0;
+}
+
+#tabla-gestion-articulos tbody tr {
+    background-color: #f9fbfd;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+#tabla-gestion-articulos tbody tr:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+/* Botones de acción */
+#tabla-gestion-articulos .btn-excel {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    margin: 0 4px;
+}
+
+/* === DISEÑO PROFESIONAL PARA EL MODAL DE LIQUIDACIÓN === */
+#modal-liquidacion .modal-content {
+    /* Tamaño del contenedor */
+    max-width: 95vw;
+    min-width: 1000px;
+    max-height: 90vh;
+    height: auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    box-sizing: border-box;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    background: white;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+
+    /* Alineación de contenido dentro del modal */
+    align-items: stretch; /* Esto hace que el contenido se ajuste al ancho del contenedor */
+}
+
+/* Título del modal */
+#modal-liquidacion .modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #003366;
+    font-size: 1.4em;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 15px;
+}
+
+/* Botón de cerrar */
+#modal-liquidacion .close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    color: #6c757d;
+    cursor: pointer;
+    z-index: 10;
+    background: none;
+    border: none;
+    font-weight: bold;
+    transition: color 0.2s;
+}
+
+#modal-liquidacion .close:hover {
+    color: #dc3545;
+}
+
+/* Contenedor de los datos de contacto */
+#modal-liquidacion .datos-contacto {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-bottom: 2px;
+    padding: 5px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+#modal-liquidacion .datos-contacto input,
+#modal-liquidacion .datos-contacto textarea {
+    width: 100%; /* Hace que los inputs ocupen todo el ancho disponible */
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+}
+
+#modal-liquidacion .datos-contacto input:focus,
+#modal-liquidacion .datos-contacto textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+/* Estilos para los campos dentro de .datos-contacto */
+#modal-liquidacion .datos-contacto .form-group {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+}
+
+#modal-liquidacion .datos-contacto label {
+    flex-basis: 180px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9em;
+    text-align: right;
+    white-space: nowrap;
+}
+
+#modal-liquidacion .datos-contacto input,
+#modal-liquidacion .datos-contacto textarea {
+    flex-grow: 50;
+    padding: 6px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+}
+
+#modal-liquidacion .datos-contacto input:focus,
+#modal-liquidacion .datos-contacto textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+/* Campo de observaciones (más grande) */
+#modal-liquidacion .datos-contacto #liquidacion-observacion {
+    grid-column: 1 / -1;
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Sección de series instaladas */
+#contenedor-series {
+    margin-top: 25px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+#contenedor-series > div {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+#contenedor-series label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9em;
+    white-space: nowrap;
+    min-width: 120px;
+    text-align: right;
+}
+
+#contenedor-series select,
+#contenedor-series input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+}
+
+#contenedor-series select:focus,
+#contenedor-series input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+/* === NUEVO: SECCIÓN DE EQUIPOS Y TARJETAS RETIRADAS === */
+#contenedor-retirados {
+    margin-top: 5px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+#contenedor-retirados h4 {
+    margin-top: 0;
+    margin-bottom: 2px;
+    color: #dc3545;
+    font-size: 1.1em;
+    font-weight: 700;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+#contenedor-retirados .grupo-retirado {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1px;
+    padding: 1px;
+    background: #fef8f8;
+    border: 1px solid #f8d7da;
+    border-radius: 70px;
+}
+
+#contenedor-retirados .grupo-retirado label {
+    font-weight: 500;
+    color: #0d0d0d;
+    font-size: 0.9em;
+    white-space: nowrap;
+    min-width: 140px; /* 👈 Ajustado para alinear mejor */
+    text-align: right;
+}
+
+#contenedor-retirados .grupo-retirado input {
+    flex: 1;
+    min-width: 200px;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1em;
+}
+
+/* Botones de acción */
+#modal-liquidacion .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+}
+
+#btn-cancelar-liquidacion,
+#btn-confirmar-liquidacion {
+    padding: 2px 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 1000;
+    font-size: 1em;
+    transition: all 0.5s;
+}
+
+#btn-cancelar-liquidacion {
+    background-color: #984752;
+    color: white;
+}
+
+#btn-cancelar-liquidacion:hover {
+    background-color: #f70545;
+}
+
+#btn-confirmar-liquidacion {
+    background-color: #007bff;
+    color: white;
+}
+
+#btn-confirmar-liquidacion:hover {
+    background-color: #0056b3;
+}
+
+#btn-confirmar-liquidacion:disabled {
+    background-color: #ab0303;
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Mensaje de validación */
+#validacion-tecnico-despacho {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 1200px) {
+    #modal-liquidacion .modal-content {
+        min-width: 800px;
+        padding: 20px;
+    }
+    #modal-liquidacion .datos-contacto {
+        grid-template-columns: 1fr;
+    }
+    #contenedor-series > div {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #contenedor-retirados .grupo-retirado {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #contenedor-retirados .grupo-retirado label {
+        text-align: left;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 800px) {
+    #modal-liquidacion .modal-content {
+        min-width: 95%;
+        max-width: 95%;
+        padding: 15px;
+    }
+    #modal-liquidacion .modal-content h3 {
+        font-size: 1.2em;
+    }
+    #modal-liquidacion .datos-contacto {
+        padding: 15px;
+    }
+    #contenedor-series,
+    #contenedor-retirados {
+        padding: 15px;
+    }
+    #contenedor-series > div,
+    #contenedor-retirados .grupo-retirado {
+        padding: 10px;
+    }
+}
+
+/* Asegurar que el contenedor de series tenga scroll interno si es necesario */
+#contenedor-series {
+    max-height: 40vh; /* Limita la altura máxima del contenedor de series */
+    overflow-y: auto; /* Scroll si hay muchos puntos */
+    padding: 15px 0;
+}
+
+/* Estilo para los campos de entrada de series retiradas (opcional) */
+.input-serie-salida {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+/* Estilo para los selects de decos y tarjetas */
+.select-serie-entrada,
+.select-tarjeta-entrada {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+/* Ajuste para el botón de confirmar */
+#btn-confirmar-liquidacion {
+    margin-top: 20px;
+    align-self: flex-end;
+}
+
+/* Reducir el padding/margin en los puntos para ahorrar espacio */
+.form-group {
+    margin-bottom: 10px !important;
+}
+
+#contenedor-series > div {
+    margin-bottom: 12px !important;
+    padding: 8px !important;
+}
+
+#main-nav {
+    display: flex;
+    gap: 10px;
+    background: #003366;
+    padding: 10px 20px;
+    border-bottom: 3px solid #007bff;
+}
+
+.module-btn {
+    background: #004080;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.module-btn:hover {
+    background: #0055aa;
+}
+
+.module-btn.active {
+    background: #007bff;
+}
+
+.btn-link-orden {
+    background: none;
+    border: none;
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+}
+.btn-link-orden:hover {
+    color: #0056b3;
+}
+
+
+select.error-duplicado {
+  border: 2px solid #dc3545 !important;
+  background-color: #fff5f5;
+}
+
+/* Aumentar el tamaño del contenedor del panel de Gestión Bodega */
+#panel-gestion-bodega {
+    max-width: 1000px; /* Ancho máximo */
+    width: 100%; /* Ocupa el 95% del ancho disponible */
+    margin: 20px auto; /* Centrar y añadir margen superior e inferior */
+}
+
+/* Hacer que la tabla sea más grande y legible */
+#tabla-saldo-bodega {
+    font-size: 14px; /* Tamaño de fuente más grande */
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#tabla-saldo-bodega th,
+#tabla-saldo-bodega td {
+    padding: 14px; /* Más espacio en las celdas */
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+#tabla-saldo-bodega th {
+    background-color: #003366; /* Color de fondo oscuro para encabezados */
+    color: white;
+    font-weight: bold;
+}
+
+/* Estilizar el botón de exportación */
+#exportarStockBodegaAExcel {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+#exportarStockBodegaAExcel:hover {
+    background-color: #0056b3;
+}
+
+/* Ajustar el contenedor principal para que no tenga un ancho fijo demasiado pequeño */
+#main-content {
+    max-width: 100%; /* Permitir que el contenido ocupe todo el ancho disponible */
+    padding: 50px;
+}
+
+.bodega-container {
+  max-width: 100%;
+  width: 100%;
+}
+
+/* ✅ ANCHO COMPLETO PARA GESTIÓN BODEGA */
+#panel-gestion-bodega .form-container {
+    max-width: none !important;   /* elimina el límite de 700px */
+    width: 100% !important;       /* ocupa todo el ancho disponible */
+    padding: 30px 35px;
+}
+
+/* Contenedor de la tabla */
+#panel-gestion-bodega .bodega-container {
+    width: 60%;
+    max-width: 90%;
+}
+
+/* Tabla grande y cómoda */
+#panel-gestion-bodega table {
+    width: 90%;
+    min-width: 1000px;
+}
+
+/* === CORRECCIÓN AGRESIVA PARA GESTIÓN BODEGA === */
+#panel-gestion-bodega {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 10px !important; /* Solo un pequeño padding lateral */
+}
+
+#panel-gestion-bodega h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #003366;
+}
+
+#saldo-bodega-contenido {
+    width: 100% !important;
+    padding: 0 !important;
+}
+
+#saldo-bodega-contenido .tabla-container {
+    padding: 0 !important;
+    margin-top: 10px;
+}
+
+#saldo-bodega-contenido table {
+    width: 100% !important;
+    min-width: 600px;
+}
+
+#saldo-bodega-contenido th,
+#saldo-bodega-contenido td {
+    padding: 14px !important;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+#saldo-bodega-contenido th {
+    background-color: #002244 !important;
+    color: white !important;
+    font-weight: bold;
+}
+
+#bodega-selector {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+#exportarStockBodegaAExcel {
+    padding: 10px 20px !important;
+    background-color: #28a745 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    color: white !important;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* === CORRECCIÓN ESPECÍFICA PARA LA TABLA DE LIQUIDADAS === */
+#panel-liquidadas .tabla-container {
+    overflow-x: auto !important;
+    width: 100% !important;
+    padding: 0 !important;
+}
+
+#panel-liquidadas table {
+    width: 100% !important;
+    min-width: 1000px !important;
+    border-collapse: collapse;
+}
+
+#panel-liquidadas th,
+#panel-liquidadas td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+#panel-liquidadas th {
+    background-color: #002244 !important;
+    color: white !important;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Estilos para la cabecera */
+#main-header {
+  background-color: #003366; /* Color azul oscuro, ajusta según tu diseño */
+  color: white;
+  padding: 0 20px; /* Espaciado interno */
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Centra verticalmente los elementos */
+  height: 60px; /* Altura fija para la cabecera */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Sombra sutil */
+}
+
+/* Estilos para el menú de navegación */
+#main-nav {
+  display: flex;
+  gap: 20px; /* Espacio entre los botones */
+}
+
+#main-nav button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 10px 15px;
+  transition: background-color 0.3s;
+}
+
+#main-nav button:hover {
+  background-color: rgba(255,255,255,0.1);
+  border-bottom: 2px solid white;
+}
+
+#main-nav button.active {
+  border-bottom: 2px solid white;
+}
+
+/* Estilos para el logo/copyright */
+.header-logo {
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+  text-align: right; /* Alinea el texto a la derecha */
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre el botón y el texto */
+}
+
+#btn-salir {
+  background-color: #dc3545; /* Rojo */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+#btn-salir:hover {
+  background-color: #c82333;
+}
+
+/* Ajustar el ancho de la columna "Dirección" */
+#tabla-agendadas th:nth-child(6),
+#tabla-agendadas td:nth-child(6) {
+  max-width: 200px; /* Puedes ajustar este valor según lo que necesites */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Opcional: Asegurar que el encabezado tenga el mismo ancho */
+#tabla-agendadas thead th:nth-child(6) {
+  width: 140px; /* Opcional: puedes usar 'width' en lugar de 'max-width' para un ancho fijo */
+}
+
+/* Ajustar el ancho de la columna "Nombre" */
+#tabla-agendadas th:nth-child(4),
+#tabla-agendadas td:nth-child(4) {
+  max-width: 140px; /* Puedes ajustar este valor */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* === COLORES PARA ÓRDENES POR FECHA === */
+.orden-hoy {
+  background-color: #d4edda !important; /* Verde suave */
+}
+.orden-manana {
+  background-color: #fff3cd !important; /* Amarillo suave */
+}
+.orden-futuro {
+  background-color: #e2e3e5 !important; /* Gris suave */
+}
+.orden-pasada {
+  background-color: #f8d7da !important; /* Rojo suave */
+}
+
+/* Alineación perfecta para los campos de equipos y tarjetas retiradas */
+#contenedor-retirados .serie-item-container .form-group input.form-control {
+    height: 40px; /* O el valor que mejor se vea en tu diseño */
+    line-height: 40px; /* Centra verticalmente el texto */
+    padding: 6px 12px; /* Ajusta el padding si es necesario */
+}
+
+/* Si quieres que los labels también estén alineados, puedes ajustar su altura */
+#contenedor-retirados .serie-item-container .form-group label {
+    display: flex;
+    align-items: center;
+    height: 40px; /* Mismo valor que el input */
+}
+
+/* Aumenta el ancho del textarea de observaciones */
+#liquidacion-observacion {
+    width: 50%; /* Ocupa todo el ancho disponible */
+    max-width: 60%; /* Asegura que no exceda el contenedor */
+    min-width: 100px; /* Ancho mínimo si quieres evitar que sea muy pequeño */
+    box-sizing: border-box; /* Incluye padding y borde en el ancho total */
+}
+
+/* Ajuste específico para la columna "Dirección" en la tabla de Órdenes Liquidadas */
+#tabla-liquidadas th:nth-child(5),
+#tabla-liquidadas td:nth-child(5) {
+  min-width: 250px; /* Puedes ajustar este valor según lo que necesites */
+  max-width: 400px;
+  overflow: visible;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Opcional: Si quieres que todas las celdas de la tabla tengan un poco más de padding */
+#tabla-liquidadas td,
+#tabla-liquidadas th {
+  padding: 8px 12px;
+}
+
+/* Para que el encabezado también tenga el mismo ancho */
+#tabla-liquidadas thead th:nth-child(5) {
+  min-width: 250px;
+  max-width: 400px;
+}
+
+/* === FORZAR ANCHO COMPLETO EN EL CONTENIDO PRINCIPAL === */
+
+#main-content {
+    flex-grow: 1;
+    padding: 30px;
+    overflow-y: auto;
+    background-color: #f9fbfd;
+    width: 90%; /* 👈 Fuerza el ancho completo */
+    max-width: none !important; /* 👈 Elimina cualquier restricción de ancho */
+}
+
+/* === ESTILOS PARA TRANSFERENCIA DE MATERIALES (FORZADO A OCUPAR ANCHO COMPLETO) === */
+
+#panel-transferencia {
+    width: 90%;
+    max-width: none !important;
+}
+
+#panel-transferencia .content-panel {
+    max-width: 90% !important;
+    min-width: 90% !important;
+    width: 90% !important;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#panel-transferencia .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    width: 100%;
+}
+
+#panel-transferencia .form-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+#panel-transferencia .form-group label {
+    font-weight: 600;
+    color: #333;
+    min-width: 140px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+#panel-transferencia select {
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1em;
+    min-width: 250px;
+    flex: 1;
+    width: 100%;
+}
+
+#panel-transferencia #stock-origen {
+    margin-top: 20px;
+    padding: 20px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    width: 100%;
+}
+
+#panel-transferencia #lista-materiales-origen {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+#panel-transferencia .lista-seriados-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    background: #fff;
+    transition: background 0.2s;
+    width: 100%;
+}
+
+#panel-transferencia .lista-seriados-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-top: 4px;
+}
+
+#panel-transferencia .item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+#panel-transferencia .articulo-nombre {
+    font-weight: 500;
+    font-size: 0.95em;
+    color: #333;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+#panel-transferencia .serie-numero {
+    font-size: 0.85em;
+    color: #6c757d;
+    word-break: break-all;
+    overflow-wrap: break-word;
+}
+
+#panel-transferencia #resumen-saldo {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    text-align: center;
+    width: 100%;
+}
+
+#panel-transferencia #detalle-stock {
+    margin-top: 10px;
+    padding: 20px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    min-height: 200px;
+    width: 100%;
+}
+
+#panel-transferencia #btn-transferir {
+    margin-top: 20px;
+    padding: 12px 24px;
+    font-size: 1em;
+    font-weight: 600;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 100%;
+}
+
+/* === ANULAR RESTRICCIONES DE ANCHO SOLO PARA TRANSFERENCIA === */
+#panel-transferencia,
+#panel-transferencia .form-container,
+#panel-transferencia .content-panel {
+  max-width: none !important;
+  width: 80% !important;
+  min-width: auto !important;
+}
+
+/* Asegurar que el contenedor principal no limite el ancho */
+#main-content {
+  max-width: none !important;
+}
+
+/* === ESTILOS PARA TRANSFERENCIA DE MATERIALES (NUEVOS) === */
+
+#panel-transferencia .lista-seriados-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    background: #fff;
+    transition: background 0.2s;
+    width: 100%;
+}
+
+#panel-transferencia .lista-seriados-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-top: 4px;
+}
+
+#panel-transferencia .articulo-y-serie {
+    flex: 1;
+    font-size: 0.95em;
+    color: #333;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.4;
+}
+
+#panel-transferencia .articulo-y-serie span {
+    font-size: 1em; /* 👈 Tamaño de fuente más grande para la serie */
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Fijar encabezado de tabla en Saldo Técnico */
+.saldo-tecnico-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #002d5a; /* Color del encabezado */
+    z-index: 10;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+}
+
+label[for="filtro-tecnico-saldo"] {
+    color: white !important;
+}
+
+.filtros-reporte label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+.filtros-reporte .form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filtros-reporte .form-control:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.btn-secondary {
+    background-color: #757575;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #616161;
+}
+
+.btn-success {
+    background-color: #2196F3;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #0b7dda;
+}
+
+.tabla-ordenes {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tabla-ordenes thead {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.tabla-ordenes th,
+.tabla-ordenes td {
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+.tabla-ordenes tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.tabla-ordenes tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+/* Agregado al final
+
+/* === TABLA DE REPORTES - ESTILO MEJORADO === */
+.tabla-reporte-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.tabla-ordenes {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.tabla-ordenes thead {
+    background: linear-gradient(135deg, #003366, #0056b3);
+    color: white;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.tabla-ordenes th {
+    padding: 16px 12px;
+    text-align: center;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.tabla-ordenes td {
+    padding: 14px 12px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+}
+
+.tabla-ordenes tbody tr:hover {
+    background-color: #f8fbff;
+    cursor: pointer;
+}
+
+/* Badges de estado con colores */
+.badge-estado {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.badge-agendada { background: #17a2b8; }
+.badge-liquidadas { background: #28a745; }
+.badge-rechazada { background: #dc3545; }
+
+/* Celdas con formato condicional */
+.celda-porcentaje {
+    font-weight: 600;
+    color: #003366;
+}
+
+.celda-alta { color: #28a745; font-weight: 600; }
+.celda-media { color: #ffc107; font-weight: 600; }
+.celda-baja { color: #dc3545; font-weight: 600; }
+
+/* Fila de totales destacada */
+.tabla-ordenes tfoot {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.tabla-ordenes tfoot td {
+    border-top: 2px solid #003366;
+    padding: 18px 12px;
+}
+
+/* === CONTENEDOR DEL GRÁFICO MEJORADO === */
+.grafico-reporte-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.grafico-reporte-container h3 {
+    margin: 0 0 20px 0;
+    color: #003366;
+    font-size: 1.3em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.grafico-reporte-container h3::before {
+    content: "📈";
+    font-size: 1.1em;
+}
+
+/* Contenedor del canvas con altura responsiva */
+.grafico-reporte-container .chart-wrapper {
+    position: relative;
+    height: 350px;
+    width: 100%;
+}
+
+/* Leyenda personalizada */
+.chart-legend-custom {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #555;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+
+.chart-legend-item:hover {
+    background: #f0f0f0;
+}
+
+.chart-legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#global-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loader-backdrop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loader-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4CAF50;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #guia-imprimible, #guia-imprimible * {
+        visibility: visible;
+    }
+    #guia-imprimible {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 20px;
+        background: white;
+        z-index: 9999;
+    }
+    /* Ocultar botones al imprimir */
+    .no-print, button {
+        display: none !important;
+    }
+}
+
+/* === DEVOLUCIÓN DE EQUIPOS === */
+#panel-devolucion-equipos .form-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+#panel-devolucion-equipos .form-group {
+    margin-bottom: 15px;
+}
+
+#panel-devolucion-equipos label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+#panel-devolucion-equipos .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+#panel-devolucion-equipos .form-control:disabled {
+    background: #f8f9fa;
+    cursor: not-allowed;
+}
+
+#panel-devolucion-equipos .btn-primary {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+#panel-devolucion-equipos .btn-primary:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Inputs dinámicos para series */
+.input-serie-devolucion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.input-serie-devolucion input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.input-serie-devolucion .serie-label {
+    font-weight: 600;
+    color: #555;
+    min-width: 80px;
+}
+
+/* === MODAL DE LIQUIDACIÓN - DISEÑO MEJORADO === */
+#modal-liquidacion {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    display: none;
+    overflow-y: auto;
+}
+
+#modal-liquidacion .modal-content {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Inputs con focus mejorado */
+#modal-liquidacion input:focus,
+#modal-liquidacion select:focus,
+#modal-liquidacion textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+}
+
+/* Hover effects */
+#modal-liquidacion button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#modal-liquidacion button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Scrollbar personalizada */
+#modal-liquidacion .modal-content > div::-webkit-scrollbar {
+    width: 8px;
+}
+
+#modal-liquidacion .modal-content > div::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+#modal-liquidacion .modal-content > div::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 4px;
+}
+
+#modal-liquidacion .modal-content > div::-webkit-scrollbar-thumb:hover {
+    background: #0056b3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #modal-liquidacion .modal-content {
+        margin: 20px;
+        max-width: calc(100% - 40px);
+    }
+    
+    #modal-liquidacion .modal-content > div {
+        padding: 20px;
+    }
+}
+
+#panel-devolucion-equipos .form-container {
+    max-width: 85% !important;
+    width: 85% !important;
+}
+
+#panel-devolucion-equipos #form-nmalos,
+#panel-devolucion-equipos #form-reversa {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+/* Tarjetas de órdenes reversa más anchas */
+#lista-ordenes-reversa > div {
+    max-width: 100% !important;
+}
+
+/* === DEVOLUCIÓN DE EQUIPOS - ANCHO EXTENDIDO === */
+#panel-devolucion-equipos .form-container {
+    max-width: 85% !important;
+    width: 85% !important;
+}
+
+#panel-devolucion-equipos #form-nmalos,
+#panel-devolucion-equipos #form-reversa {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+/* Tarjetas de órdenes reversa más anchas */
+#lista-ordenes-reversa > div {
+    max-width: 100% !important;
+}
+
+/* === TRANSFERENCIA - LAYOUT AJUSTADO === */
+#panel-transferencia,
+#panel-transferencia .form-container,
+#panel-transferencia .content-panel {
+    max-width: none !important;
+    width: 100% !important;
+    min-width: auto !important;
+    padding: 0 !important;
+}
+
+#panel-transferencia > div[style] {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+}
+
+/* Columnas origen/destino más compactas */
+#panel-transferencia .col-transferencia {
+    max-width: 480px;
+}
+
+/* === DEVOLUCIÓN DE EQUIPOS - ANCHO EXTENDIDO === */
+#panel-devolucion-equipos .form-container {
+    max-width: 85% !important;
+    width: 85% !important;
+}
+
+#panel-devolucion-equipos #form-nmalos,
+#panel-devolucion-equipos #form-reversa {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+/* Tarjetas de órdenes reversa más anchas */
+#lista-ordenes-reversa > div {
+    max-width: 100% !important;
+}
+
+/* === TRANSFERENCIA - LAYOUT AJUSTADO === */
+#panel-transferencia,
+#panel-transferencia .form-container,
+#panel-transferencia .content-panel {
+    max-width: none !important;
+    width: 100% !important;
+    min-width: auto !important;
+    padding: 0 !important;
+}
+
+#panel-transferencia > div[style] {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+}
+
+/* Columnas origen/destino más compactas */
+#panel-transferencia .col-transferencia {
+    max-width: 480px;
+}
+
+/* === MODAL LIQUIDACIÓN - ARREGLO VISUAL COMPLETO === */
+#modal-liquidacion .modal-content {
+    max-width: 98vw !important;
+    min-width: 1100px !important;
+    width: 92vw !important;
+    padding: 35px 40px !important;
+}
+
+/* Más espacio entre grupos de campos */
+#modal-liquidacion .datos-contacto .form-group {
+    margin-bottom: 14px !important;
+    gap: 12px !important;
+}
+
+/* Campos de contacto más anchos */
+#modal-liquidacion .datos-contacto input,
+#modal-liquidacion .datos-contacto textarea {
+    flex-grow: 1 !important;
+    min-width: 0 !important;
+    padding: 10px 12px !important;
+    font-size: 15px !important;
+}
+
+/* Labels más anchos para que no se corten */
+#modal-liquidacion .datos-contacto label {
+    flex-basis: 200px !important;
+    min-width: 200px !important;
+    font-size: 14px !important;
+}
+
+/* Sección series: más espacio entre decos */
+#contenedor-series > div {
+    margin-bottom: 16px !important;
+    padding: 14px 16px !important;
+    gap: 16px !important;
+}
+
+/* Deco y Tarjeta en la misma fila, más anchos */
+#contenedor-series > div {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+}
+
+#contenedor-series label {
+    min-width: 90px !important;
+    font-size: 14px !important;
+}
+
+#contenedor-series select,
+#contenedor-series input {
+    flex: 1 !important;
+    min-width: 180px !important;
+    padding: 10px 12px !important;
+    font-size: 14px !important;
+}
+
+/* Sección equipos retirados más espaciada */
+#contenedor-retirados .grupo-retirado {
+    padding: 10px 14px !important;
+    margin-bottom: 10px !important;
+    gap: 12px !important;
+    border-radius: 8px !important;
+}
+
+#contenedor-retirados .grupo-retirado input {
+    padding: 9px 12px !important;
+    font-size: 14px !important;
+}
+
+/* Ferretería: campos más generosos */
+#modal-liquidacion input[type="number"],
+#modal-liquidacion input[type="text"] {
+    padding: 9px 12px !important;
+}
+
+/* === FILTROS DE VENCIMIENTO DE LICENCIAS - MÁS GRANDES === */
+#panel-vencimiento-licencias .filtros-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    align-items: end;
+}
+
+#panel-vencimiento-licencias .filtro-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#panel-vencimiento-licencias .filtro-wrapper label {
+    font-weight: 700;
+    color: #333;
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+#panel-vencimiento-licencias .filtro-wrapper select,
+#panel-vencimiento-licencias .filtro-wrapper input {
+    padding: 14px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s;
+    background: white;
+}
+
+#panel-vencimiento-licencias .filtro-wrapper select:focus,
+#panel-vencimiento-licencias .filtro-wrapper input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+}
+
+#panel-vencimiento-licencias .filtro-wrapper input::placeholder {
+    color: #999;
+    font-size: 14px;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    #panel-vencimiento-licencias .filtros-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    #panel-vencimiento-licencias .filtro-wrapper select,
+    #panel-vencimiento-licencias .filtro-wrapper input {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+}
+

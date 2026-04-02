@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instal - Sistema de Gestión</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pivottable@2.23.0/dist/pivot.min.css">
+</head>
+<body>
+    <div id="toast-container"></div>
+    <div id="login-container">
+        <div class="login-box">
+            <h2>Validación de Usuario</h2>            
+            <input type="text" id="login-rut" placeholder="RUT">
+            <input type="password" id="login-pass" placeholder="Contraseña">
+            <button id="btnLogin">Ingresar</button>
+            <p class="copyright">© 2025 Instal</p>
+        </div>
+    </div>
+    <div id="app-container" style="display: none;">
+        <header id="main-header">
+            <nav id="main-nav">
+                <button data-module="dth">Despacho</button>
+                <button data-module="rrhh">RRHH</button>
+                <button data-module="logistica">Logística</button>
+                <button data-module="gestion-orden">Gestión Orden</button>
+                <button data-module="avance">Reportes</button>
+            </nav>
+            <div class="header-actions">
+                <button id="btn-salir" class="btn-excel">Salir</button>
+                <span>© 2025 Instal</span>
+            </div>
+            </header>
+    <div id="content-wrapper">
+            <aside id="sidebar">
+                <div id="submenu-dth" class="submenu">
+                    <h2>DTH</h2>
+                    <ul>
+                        <li><button data-panel="panel-ingreso-cliente">Ingreso cliente</button></li>
+                        <li><button data-panel="panel-agendadas">Agendadas</button></li>
+                        <li><button data-panel="panel-rechazadas">Rechazadas</button></li>
+                        <li><button data-panel="panel-liquidadas">Liquidadas</button></li>
+                        <li><button data-panel="panel-buscar-orden">Buscar por orden</button></li>
+                        <li><button data-panel="panel-buscar-rut">Buscar por rut</button></li>
+                        <li><button data-panel="panel-buscar-serie">🔍 Buscar Serie</button></li>
+                        <li><button data-panel="panel-reversar-orden-despacho">↩️ Reversar orden</button></li>
+                    </ul>
+                </div>
+                <div id="submenu-rrhh" class="submenu">
+                    </ul>
+                    <h3 class="submenu-group-title">Personal</h3>
+                    <ul>
+                        <li><button data-panel="panel-lista-personal">Personal</button></li>
+                        <li><button data-panel="panel-nuevo-ingreso">Nuevos Ingresos</button></li>
+                        <li><button data-panel="panel-buscar-colaborador">Buscar Colaborador</button></li>
+                        <li><button data-panel="panel-gestion-usuarios">Gestionar Usuarios</button></li>
+                    </ul>
+                </div>
+
+                <!-- ✅ SUBMENU AVANCE / REPORTES (NUEVO) -->
+                <div id="submenu-avance" class="submenu">
+                    <h2>Reportes</h2>
+                    <ul>
+                        <li><button data-panel="reportes-produccion">📊 Reportes de Producción</button></li>
+                    </ul>
+                </div>
+                <div id="submenu-logistica" class="submenu">
+                    <h2>Logística</h2>
+                    <ul>
+                        <li><button data-panel="panel-ingreso-seriados">Ingreso de Equipos</button></li>
+                        <li><button data-panel="panel-ingreso-no-seriados">Ingreso de Tarjeta</button></li>
+                        <li><button data-panel="panel-ingreso-lnb">Ingreso de LNB</button></li>
+                        <li><button data-panel="panel-asignacion-materiales">Asignación de Materiales</button></li>
+                        <li><button data-panel="panel-gestion-bodega">Gestión Bodega</button></li>
+                        <li><button data-panel="panel-transferencia">Transferencia de Materiales</button></li>
+                        <li><button data-panel="panel-devolucion-equipos">Devolución de Equipos</button></li>
+                        <li><button data-panel="panel-guia-salida">Guía de Salida</button></li>
+                        <li><button data-panel="panel-inventario">Inventario</button></li>
+                        <li><button data-panel="panel-saldo-tecnico">Saldo Técnico</button></li>
+                        <li><button data-panel="panel-gestion-equipos">Gestión Equipos</button></li>
+                        <li><button data-panel="panel-buscar-serie">Buscar Serie</button></li>
+                        <li><button data-panel="panel-buscar-orden">Buscar Orden</button></li>
+                        <li><button data-panel="panel-buscar-rut">Buscar por RUT</button></li>
+                    </ul>
+                </div>
+            </aside>
+            <main id="main-content">
+                <div id="modulo-bienvenida" class="content-panel" style="display: none; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; width: 100%; height: 100%; box-sizing: border-box;">
+                    <div style="width: 100%; height: 80%; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                        <img id="imagen-modulo" src="" alt="Imagen del módulo" style="max-width: 90%; max-height: 90%; object-fit: contain; opacity: 0; transition: opacity 0.4s ease;">
+                    </div>
+                    <h2 id="titulo-modulo" style="margin-top: 1rem; opacity: 0; transition: opacity 0.4s ease; font-size: 1.5rem; color: #333;">Selecciona una opción del menú</h2>
+                </div>
+                <div id="panel-avance" class="content-panel">
+                    <h1>Reportes</h1>
+                    <p>Seleccione una opción del menú lateral para generar reportes.</p>
+                </div>
+                <div id="panel-ingreso-cliente" class="content-panel">
+                    <h2 id="titulo-ingreso-orden">Ingreso Orden</h2>
+                    <div class="form-container">
+                        <div id="paso-1">
+                            <div class="form-group">
+                                <label for="orden-numero">Número de Orden:</label>
+                                <input type="text" id="orden-numero" placeholder="Ej: 123456" required>
+                                <button type="button" id="btnSiguientePaso1">Siguiente</button>
+                            </div>
+                        </div>
+                        <div id="paso-2" style="display: none;">
+                            <div class="form-group">
+                                <label for="orden-region">Región:</label>
+                                <select id="orden-region" required>
+                                    <option value="">-- Seleccione Región --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" id="btnValidarCombinacion">✅ Validar combinación</button>
+                                <button type="button" id="btnVolverPaso1" style="margin-left: 10px; background: #6c757d;">← Volver</button>
+                            </div>
+                        </div>
+                        <form id="form-ingreso-orden" style="display: none;">
+                            <div class="form-group">
+                                <label for="orden-comuna">Comuna:</label>
+                                <select id="orden-comuna" required>
+                                    <option value="">-- Seleccione Comuna --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="orden-rut">RUT:</label>
+                                <input type="text" id="orden-rut" placeholder="Ej: 12345678-9" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="orden-nombre">Nombre del Cliente:</label>
+                                <input type="text" id="orden-nombre" placeholder="Nombre completo" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="orden-direccion">Dirección:</label>
+                                <input type="text" id="orden-direccion" placeholder="Dirección completa" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="numeroContacto">Teléfono de Contacto:</label>
+                                <input type="text" id="numero_contacto" placeholder="Ej: 912345678">
+                            </div>
+                            <div class="form-group">
+                                <label for="orden-servicio">Servicio:</label>
+                                <select id="orden-servicio" required>
+                                    <option value="">-- Seleccione Servicio --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="orden-sub">Subservicio:</label>
+                                <select id="orden-sub" required>
+                                    <option value="">-- Seleccione Subservicio --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="orden-fecha">Fecha de Instalación:</label>
+                                <input type="date" id="orden-fecha" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="orden-tecnico">Técnico:</label>
+                                <select id="orden-tecnico">
+                                    <option value="">-- Seleccione Técnico --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="orden-despacho">Despacho:</label>
+                                <select id="orden-despacho" required>
+                                    <option value="">-- Seleccione Despacho --</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="orden-observacion">Observaciones (opcional):</label>
+                                <textarea id="orden-observacion" placeholder="Notas adicionales..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit">💾 Guardar Orden</button>
+                                <button type="button" id="btnCancelarIngreso" style="margin-left: 10px; background: #6c757d;">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="panel-agendadas" class="content-panel">
+                    <div class="sticky-header">
+                        <h2>Órdenes Agendadas</h2>
+                        <div class="filtros-container" style="display: none;">
+                            <div class="filtro-row grid-filtros">
+                                <div class="filtro-wrapper"><label for="filtro-tecnico">Técnico</label><select id="filtro-tecnico" class="filtro-item"></select></div>
+                                <div class="filtro-wrapper"><label for="filtro-region">Región</label><select id="filtro-region" class="filtro-item"></select></div>
+                                <div class="filtro-wrapper"><label for="filtro-comuna">Comuna</label><select id="filtro-comuna" class="filtro-item"></select></div>
+                                <div class="filtro-wrapper"><label for="filtro-servicio">Servicio</label><select id="filtro-servicio" class="filtro-item"></select></div>
+                                <div class="filtro-wrapper"><label for="filtro-fecha">Fecha</label><input type="date" id="filtro-fecha" class="filtro-item"></div>
+                            </div>
+                            <div class="filtro-actions">
+                                <div class="filtro-buscar">
+                                    <label for="filtro-buscador">Buscar</label>
+                                    <input type="text" id="filtro-buscador" placeholder="🔍 Buscar por N°, RUT, nombre...">
+                                </div>
+                                <div class="filtro-botones">
+                                    <button id="btnResetFiltros" class="btn-reset">❌ Quitar filtros</button>
+                                    <button id="btnEnviarCorreo" class="btn-email">📧 Enviar Correo</button>
+                                    <button id="btnEnviarWhatsapp" class="btn-wsp">💬 Enviar WhatsApp</button>
+                                    <button id="btnExportarExcel" class="btn-excel">📊 Exportar Excel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scroll-container">
+                        <div class="tabla-container">
+                            <table id="tabla-agendadas">
+                                <thead>
+                                    <tr>
+                                        <th>N° Orden</th><th>Fecha</th><th>Sub Servicio</th><th>Nombre</th><th>RUT</th><th>Dirección</th><th>Comuna</th><th>Técnico</th><th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <div id="paginacion"></div>
+                    </div>
+                </div>
+                <div id="panel-buscar-orden" class="content-panel">
+                    <h2>Buscar por Número de Orden</h2>
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label for="buscar-orden-input">N° Orden:</label>
+                            <input type="text" id="buscar-orden-input">
+                            <button id="btnBuscarPorOrden">Buscar</button>
+                        </div>
+                        <div id="resultado-orden" class="resultado-busqueda"></div>
+                    </div>
+                </div>
+                <div id="panel-reversar-orden-despacho" class="form-container" style="display: none;">
+                    <h3>↩️ Reversar Orden (Liquidadas → Agendada)</h3>
+                    <div class="form-group">
+                        <label for="reversar-orden-numero-despacho">N° Orden liquidadas:</label>
+                        <input type="text" id="reversar-orden-numero-despacho" placeholder="Ej: 123456">
+                        <button id="btn-reversar-orden-despacho">Reversar Orden</button>
+                    </div>
+                    <div id="resultado-reversar-orden-despacho"></div>
+                </div>
+                <div id="panel-buscar-rut" class="content-panel">
+                    <h2>Buscar por RUT</h2>
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label for="buscar-rut-input">RUT:</label>
+                            <input type="text" id="buscar-rut-input" placeholder="Ej: 12345678-9">
+                            <button id="btnBuscarPorRut">Buscar</button>
+                        </div>
+                        <div id="resultado-rut" class="resultado-busqueda"></div>
+                    </div>
+                </div>
+                <div id="panel-gestion-cargos" class="content-panel">
+                    <h2>Gestión de Cargos</h2>
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label for="nuevo-cargo-nombre">Nuevo Cargo:</label>
+                            <input type="text" id="nuevo-cargo-nombre" placeholder="Ej: Técnico, Despacho">
+                            <button id="btnAgregarCargo">Agregar Cargo</button>
+                        </div>
+                        <ul id="lista-cargos" class="lista-gestion"></ul>
+                    </div>
+                </div>
+                <div id="panel-lista-personal" class="content-panel">
+                    <h2>Personal de la Empresa</h2>
+                    <div class="tabla-container">
+                        <table id="tabla-personal">
+                            <thead>
+                                <tr>
+                                    <th>Nombre Completo</th><th>RUT</th><th>Cargo</th><th>Fecha Ingreso</th><th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="panel-nuevo-ingreso" class="content-panel">
+                    <h2>Ingreso de Nuevo Personal</h2>
+                    <div class="form-container">
+                        <form id="form-nuevo-ingreso" class="form-grid">
+                            <div class="form-group"><label for="emp-nombre1">Primer Nombre:</label><input type="text" id="emp-nombre1" required></div>
+                            <div class="form-group"><label for="emp-nombre2">Segundo Nombre:</label><input type="text" id="emp-nombre2"></div>
+                            <div class="form-group"><label for="emp-apepaterno">Apellido Paterno:</label><input type="text" id="emp-apepaterno" required></div>
+                            <div class="form-group"><label for="emp-apematerno">Apellido Materno:</label><input type="text" id="emp-apematerno" required></div>
+                            <div class="form-group"><label for="emp-rut">RUT:</label><input type="text" id="emp-rut" placeholder="Ej: 12345678-9" required></div>
+                            <div class="form-group"><label for="emp-telefono">Teléfono:</label><input type="text" id="emp-telefono"></div>
+                            <div class="form-group full-width"><label for="emp-direccion">Dirección:</label><input type="text" id="emp-direccion"></div>
+                            <div class="form-group"><label for="emp-region">Región:</label><input type="text" id="emp-region" placeholder="Ej: Los Lagos" required></div>
+                            <div class="form-group"><label for="emp-comuna">Comuna:</label><input type="text" id="emp-comuna" placeholder="Ej: Osorno" required></div>
+                            <div class="form-group"><label for="emp-fecha-nac">Fecha Nacimiento:</label><input type="date" id="emp-fecha-nac" required></div>
+                            <div class="form-group"><label for="emp-email">Email:</label><input type="email" id="emp-email"></div>
+                            <div class="form-group"><label for="emp-cargo">Cargo:</label><select id="emp-cargo" required></select></div>
+                            <div class="form-group"><label for="emp-fecha-ingreso">Fecha Ingreso:</label><input type="date" id="emp-fecha-ingreso" required></div>
+                            <div class="form-group" id="grupo-licencia-tecnico" style="display: none;">
+                                <label for="emp-fecha-vencimiento-licencia">Fecha vencimiento licencia de conducir:</label>
+                                <input type="date" id="emp-fecha-vencimiento-licencia" required>
+                            </div>
+                            <div class="form-group full-width"><label for="emp-observacion">Observaciones:</label><textarea id="emp-observacion"></textarea></div>
+                            <div class="form-group full-width"><button type="submit">Guardar Empleado</button></div>
+                        </form>
+                    </div>
+                </div>
+                <div id="panel-buscar-colaborador" class="content-panel">
+                    <h2>Buscar Colaborador</h2>
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label for="buscar-colab-input">Buscar por RUT o Nombre:</label>
+                            <input type="text" id="buscar-colab-input" placeholder="Ej: Ignacio o 12345678-9">
+                            <button id="btnBuscarColaborador">Buscar</button>
+                        </div>
+                        <div id="resultado-busqueda-colab" class="resultado-busqueda"></div>
+                    </div>
+                </div>
+                <div id="panel-editar-empleado" class="content-panel">
+                    <h2>Editar Colaborador</h2>
+                    <div class="form-container">
+                        <form id="form-editar-empleado" class="form-grid">
+                            <input type="hidden" id="editar-empleado-id">
+                            <div class="form-group"><label for="editar-nombre1">Primer Nombre:</label><input type="text" id="editar-nombre1" required></div>
+                            <div class="form-group"><label for="editar-nombre2">Segundo Nombre:</label><input type="text" id="editar-nombre2"></div>
+                            <div class="form-group"><label for="editar-apepaterno">Apellido Paterno:</label><input type="text" id="editar-apepaterno" required></div>
+                            <div class="form-group"><label for="editar-apematerno">Apellido Materno:</label><input type="text" id="editar-apematerno" required></div>
+                            <div class="form-group"><label for="editar-rut">RUT:</label><input type="text" id="editar-rut" required></div>
+                            <div class="form-group"><label for="editar-telefono">Teléfono:</label><input type="text" id="editar-telefono"></div>
+                            <div class="form-group full-width"><label for="editar-direccion">Dirección:</label><input type="text" id="editar-direccion"></div>
+                            <div class="form-group"><label for="editar-region">Región:</label><input type="text" id="editar-region" required></div>
+                            <div class="form-group"><label for="editar-comuna">Comuna:</label><input type="text" id="editar-comuna" required></div>
+                            <div class="form-group"><label for="editar-fecha-nac">Fecha Nacimiento:</label><input type="date" id="editar-fecha-nac" required></div>
+                            <div class="form-group"><label for="editar-email">Email:</label><input type="email" id="editar-email"></div>
+                            <div class="form-group"><label for="editar-cargo">Cargo:</label><select id="editar-cargo" required></select></div>
+                            <div class="form-group"><label for="editar-fecha-ingreso">Fecha Ingreso:</label><input type="date" id="editar-fecha-ingreso" required></div>
+                            <div class="form-group" id="grupo-licencia-tecnico-edit" style="display: none;">
+                                <label for="editar-fecha-vencimiento-licencia">Fecha vencimiento licencia de conducir:</label>
+                                <input type="date" id="editar-fecha-vencimiento-licencia"></div>
+                                <div class="form-group full-width"><label for="editar-observacion">Observaciones:</label><textarea id="editar-observacion"></textarea></div>
+                            <div class="form-group full-width">
+                                <button type="submit">Actualizar Empleado</button>
+                                <button type="button" id="btnCancelarEdicion" style="margin-left:10px; background:#6c757d;">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="panel-gestion-usuarios" class="content-panel">
+                    <h2>👥 Gestión de Usuarios del Sistema</h2>
+                    <div class="form-group">
+                        <label for="usuario-rut">RUT (usuario):</label>
+                        <input type="text" id="usuario-rut" placeholder="Ej: 12345678-9" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="usuario-nombre">Nombre Completo:</label>
+                        <input type="text" id="usuario-nombre" placeholder="Ej: Juan Pérez">
+                    </div>
+                    <div class="form-group">
+                        <label for="usuario-rol">Rol:</label>
+                        <select id="usuario-rol">
+                            <option value="">-- Seleccione Rol --</option>
+                            <option value="admin">Administrador</option>
+                            <option value="rrhh">RRHH</option>
+                            <option value="despacho-n1">Despacho Nivel 1</option>
+                            <option value="despacho-n2">Despacho Nivel 2</option>
+                            <option value="logistica">Logística</option>
+                            <option value="lector">Lector</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="usuario-pass">Contraseña:</label>
+                        <input type="password" id="usuario-pass" placeholder="Mínimo 6 caracteres">
+                    </div>
+                    <button id="btn-crear-usuario" class="btn-excel">✅ Crear Usuario</button>
+                    <hr style="margin: 25px 0;">
+                    <h3>Usuarios Registrados</h3>
+                    <div id="lista-usuarios" style="margin-top: 15px;"></div>
+                </div>
+                <div id="panel-liquidadas" class="content-panel">
+                    <h2>Órdenes Liquidadas</h2>
+                    <div id="resumen-liquidadas"></div>
+                    <div class="filtros-fecha">
+                        <label for="filtro-liquida-inicio">Desde:</label>
+                        <input type="date" id="filtro-liquida-inicio">
+                        <label for="filtro-liquida-fin">Hasta:</label>
+                        <input type="date" id="filtro-liquida-fin">
+                        <button id="btnFiltrarLiquidadas">Filtrar</button>
+                        <button id="btnLimpiarFiltroLiquidadas">Limpiar</button>
+                        <button id="btnExportarExcelLiquidadas" class="btn-excel">📊 Exportar Excel</button>
+                    </div>
+                    <div class="tabla-container" style="overflow-x: auto; width: 100%; padding: 0;">
+                        <table id="tabla-liquidadas" style="width: 100%; border-collapse: collapse; min-width: 900px;">
+                        <thead>
+                            <tr style="background-color: #002244; color: white; text-align: left;">
+                            <th style="padding: 12px 15px;">N° Orden</th>
+                            <th style="padding: 12px 15px;">Fecha</th>
+                            <th style="padding: 12px 15px;">Cliente</th>
+                            <th style="padding: 12px 15px;">RUT</th>
+                            <th style="padding: 12px 15px; min-width: 50px;">Dirección</th>
+                            <th style="padding: 12px 15px;">Técnico</th>
+                            <th style="padding: 12px 15px;">Servicio</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        </table>
+                    </div>
+                    <p>Total: <span id="total-liquidadas">0</span></p>
+                </div>
+                <div id="panel-rechazadas" class="content-panel">
+                    <h2>Órdenes Rechazadas</h2>
+                    <div class="filtros-fecha">
+                        <label for="filtro-rechazo-inicio">Desde:</label>
+                        <input type="date" id="filtro-rechazo-inicio">
+                        <label for="filtro-rechazo-fin">Hasta:</label>
+                        <input type="date" id="filtro-rechazo-fin">
+                        <button id="btnFiltrarRechazadas">Filtrar</button>
+                        <button id="btnLimpiarFiltroRechazadas">Limpiar</button>
+                        <button id="btnExportarExcelRechazadas" class="btn-excel">📊 Exportar Excel</button>
+                    </div>
+                    <div class="tabla-container">
+                        <table id="tabla-rechazadas">
+                        <thead>
+                            <tr>
+                            <th>N° Orden</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>RUT</th>
+                            <th style="min-width: 100px;">Dirección</th>
+                            <th>Técnico</th>
+                            <th>Motivo</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="reportes-logistica" class="content-panel">
+                    <h2>Reportes de Logística</h2>
+                    <div class="form-container" style="max-width: 600px;">
+                        <p>En desarrollo.</p>
+                    </div>
+                </div>
+                <div id="reportes-rrhh" class="content-panel">
+                    <h2>Reportes de RRHH</h2>
+                    <div class="form-container" style="max-width: 600px;">
+                        <div style="margin-bottom: 20px;">
+                            <h3>Listados</h3>
+                            <div class="report-buttons">
+                                <button data-report-type="activo" class="btn-excel">Personal Activo</button>
+                                <button data-report-type="inactivo" class="btn-excel">Personal Inactivo</button>
+                                <button data-report-type="todos" class="btn-excel">Todo el Personal</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+                
+                <div id="panel-ingreso-seriados" class="content-panel">
+                    <h2>Ingreso de Equipos</h2>
+                    <div class="form-container">
+                        <form id="form-ingreso-seriados">
+                            <div class="form-group">
+                                <label for="guia-seriados">N° de Guía:</label>
+                                <input type="text" id="guia-seriados" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="fecha-ingreso-seriados">Fecha de Ingreso:</label>
+                                <input type="date" id="fecha-ingreso-seriados" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="articulo-seriado">Artículo:</label>
+                                <select id="articulo-seriado" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="archivo-excel-seriados">Cargar Excel (2 columnas: Serie1, Serie2):</label>
+                                <input type="file" id="archivo-excel-seriados" accept=".xlsx, .xls" required>
+                            </div>
+                            <div class="form-group full-width">
+                                <button type="submit">Registrar Ingreso</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="panel-ingreso-no-seriados" class="content-panel">
+                    <h2>Ingreso de Tarjetas</h2>
+                    <div class="form-container">
+                        <form id="form-ingreso-no-seriados">
+                            <div class="form-group">
+                                <label for="guia-no-seriados">N° de Guía:</label>
+                                <input type="text" id="guia-no-seriados" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="fecha-ingreso-no-seriados">Fecha de Ingreso:</label>
+                                <input type="date" id="fecha-ingreso-no-seriados" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="articulo-no-seriado">Tarjeta:</label>
+                                <select id="articulo-no-seriado" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="archivo-excel-tarjetas">Cargar Excel (1 columna: Código):</label>
+                                <input type="file" id="archivo-excel-tarjetas" accept=".xlsx, .xls" required>
+                            </div>
+                            <div class="form-group full-width">
+                                <button type="submit">Registrar Ingreso tarjetas</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="panel-ingreso-lnb" class="content-panel">
+                    <h2>Ingreso de LNB</h2>
+                    <div class="form-container">
+                        <form id="form-ingreso-lnb">
+                        <div class="form-group">
+                            <label for="guia-lnb">N° de Guía:</label>
+                            <input type="text" id="guia-lnb" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha-ingreso-lnb">Fecha de Ingreso:</label>
+                            <input type="date" id="fecha-ingreso-lnb" required> <!-- ✅ ID CORREGIDO -->
+                        </div>
+                        <div class="form-group">
+                            <label for="articulo-lnb">Artículo LNB:</label>
+                            <select id="articulo-lnb" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="archivo-excel-lnb">Cargar Excel (1 columna: Código):</label>
+                            <input type="file" id="archivo-excel-lnb" accept=".xlsx, .xls" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <button type="submit">Registrar Ingreso LNB</button>
+                        </div>
+                        </form>
+                    </div>
+                    </div>
+                <div id="panel-asignacion-materiales" class="content-panel">
+                    <h2>Asignación de Materiales</h2>
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label for="tecnico-asignacion">Técnico:</label>
+                            <select id="tecnico-asignacion" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo-asignacion">Tipo de Material:</label>
+                            <select id="tipo-asignacion" required>
+                                <option value="">-- Seleccione --</option>
+                                <option value="equipo">Equipo</option>
+                                <option value="tarjeta">Tarjeta</option>
+                                <option value="lnb">LNB</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="material-asignacion">Material:</label>
+                            <select id="material-asignacion" required>
+                                <option value="">-- Seleccione tipo primero --</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="contenedor-cantidad" style="display:none;">
+                            <label for="cantidad-asignar">Cantidad a asignar:</label>
+                            <input type="number" id="cantidad-asignar" min="1" required>
+                            <button type="button" id="btn-confirmar-cantidad" class="btn-excel">Confirmar Cantidad</button>
+                        </div>
+                        <div class="form-group" id="contenedor-ingreso-series" style="display:none;">
+                            <label for="input-serie">Ingrese serie (una a la vez):</label>
+                            <input type="text" id="input-serie" placeholder="Ej: ABC123456 (presione Enter)">
+                            <div id="lista-series-ingresadas" style="margin-top:12px; min-height:40px;"></div>
+                        </div>
+                        <div class="form-group full-width" id="contenedor-asignar-final" style="display:none;">
+                            <button type="button" id="btn-asignar-material" class="btn-excel">✅ Asignar Material</button>
+                        </div>
+                        <div class="form-group" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                        <h3 style="margin-bottom: 15px; color: #003366;">📦 Asignación Masiva desde Excel</h3>
+                        <p style="margin-bottom: 15px; font-size: 0.9em; color: #666;">
+                            El archivo Excel debe tener dos columnas:
+                            <strong>nombre_tecnico</strong> (o <strong>rut_tecnico</strong>) y <strong>serie</strong>.
+                        </p>
+                        <div class="form-group">
+                            <label for="archivo-asignacion-masiva">Cargar archivo Excel:</label>
+                            <input type="file" id="archivo-asignacion-masiva" accept=".xlsx, .xls">
+                        </div>
+                        <button id="btn-asignacion-masiva" class="btn-excel" style="margin-top: 10px;">📤 Procesar Asignación Masiva</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="panel-transferencia" class="content-panel">
+                    <h2>🔄 Transferencia de Materiales entre Técnicos</h2>
+
+                    <!-- FILA SUPERIOR: Origen + Destino lado a lado -->
+                    <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px; max-width:960px;">
+
+                        <!-- COLUMNA ORIGEN -->
+                        <div style="flex:1; min-width:260px; max-width:460px; background:#fff; border-radius:10px; padding:15px; box-shadow:0 2px 10px rgba(0,0,0,0.07); border-top:4px solid #007bff;">
+                            <h4 style="margin:0 0 15px; color:#007bff;">📤 Técnico Origen</h4>
+                            <select id="tec-origen" style="width:100%; padding:10px; border:1px solid #ced4da; border-radius:6px; font-size:14px;">
+                                <option value="">-- Seleccione técnico --</option>
+                            </select>
+
+                            <!-- Lista de materiales -->
+                            <div id="stock-origen" style="display:none; margin-top:15px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                    <strong style="font-size:14px; color:#333;">Materiales disponibles:</strong>
+                                    <button onclick="seleccionarTodosTransferencia()" 
+                                        style="background:none; border:1px solid #007bff; color:#007bff; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px;">
+                                        Seleccionar todos
+                                    </button>
+                                </div>
+                                <div id="lista-materiales-origen" 
+                                    style="max-height:380px; overflow-y:auto; border:1px solid #dee2e6; border-radius:6px; padding:8px; background:#f8f9fa;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COLUMNA DESTINO -->
+                        <div style="flex:1; min-width:260px; max-width:460px; background:#fff; border-radius:10px; padding:15px; box-shadow:0 2px 10px rgba(0,0,0,0.07); border-top:4px solid #28a745;">
+                            <h4 style="margin:0 0 15px; color:#28a745;">📥 Técnico Destino</h4>
+                            <div id="contenedor-destino" style="display:none;">
+                                <select id="tec-destino" style="width:100%; padding:10px; border:1px solid #ced4da; border-radius:6px; font-size:14px;">
+                                    <option value="">-- Seleccione destino --</option>
+                                </select>
+                                <p style="color:#888; font-size:13px; margin-top:10px;">
+                                    Selecciona los materiales del origen y elige a quién transferir.
+                                </p>
+                            </div>
+                            <div id="resumen-transferencia" style="display:none; margin-top:15px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GUÍA + BOTÓN TRANSFERIR -->
+                    <div id="contenedor-guia-transferencia" style="display:none; max-width:500px; margin-top:15px;">
+                        <div style="background:#fff; border-radius:10px; padding:15px 20px; box-shadow:0 2px 10px rgba(0,0,0,0.07); border-top:4px solid #ffc107;">
+                            <label style="font-weight:600; color:#856404; display:block; margin-bottom:8px;">📋 Número de Guía *</label>
+                            <input type="text" id="guia-transferencia" placeholder="Ej: GUIA-2026-001"
+                                style="width:100%; padding:10px 12px; border:1px solid #ced4da; border-radius:6px; font-size:14px; box-sizing:border-box;">
+                        </div>
+                    </div>
+                    <div style="margin-top:15px;">
+                        <button id="btn-transferir" style="display:none; padding:12px 40px; background:#28a745; color:white; border:none; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(40,167,69,0.3);">
+                            ✅ Transferir Seleccionados
+                        </button>
+                    </div>
+                </div>
+                <div id="panel-devolucion-equipos" class="content-panel">
+                    <h2>🔧 Devolución de Equipos</h2>
+                    
+                    <div class="form-container">
+                        <!-- Selector de Tipo -->
+                        <div class="form-group">
+                            <label for="tipo-devolucion"><strong>Tipo de Devolución:</strong></label>
+                            <select id="tipo-devolucion" class="form-control" onchange="cambiarTipoDevolucion()">
+                                <option value="">-- Seleccione --</option>
+                                <option value="nmalos">🔴 Nuevos Malos (desde técnico)</option>
+                                <option value="reversa">🔄 Reversa (retirado de cliente)</option>
+                            </select>
+                        </div>
+
+                        <!-- ==================== FORMULARIO NUEVOS MALOS ==================== -->
+                        <div id="form-nmalos" style="display:none; background:#fff5f5; padding:25px; border-radius:8px; border-left:5px solid #dc3545; margin-top:20px;">
+                            <h3 style="color:#dc3545; margin-top:0;">🔴 Equipos Nuevos Malos</h3>
+                            <p style="color:#666; font-size:13px; margin-bottom:20px;">
+                                ⚠️ Los equipos se validan contra el stock del técnico. Quedan en bodega estado "Nmalos" awaiting revisión.
+                            </p>
+                            
+                            <!-- Técnico -->
+                            <div class="form-group">
+                                <label for="tecnico-nmalos"><strong>Técnico *</strong></label>
+                                <select id="tecnico-nmalos" class="form-control" onchange="habilitarCantidad('nmalos')">
+                                    <option value="">-- Seleccione técnico --</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Cantidad (ACHICADO) -->
+                            <div class="form-group">
+                                <label for="cantidad-nmalos"><strong>Cantidad de Equipos *</strong></label>
+                                <input type="number" id="cantidad-nmalos" class="form-control" min="1" max="10" 
+                                    placeholder="Ej: 2" style="max-width:120px;" disabled 
+                                    onchange="generarCamposSeriesDevolucion('nmalos')">
+                            </div>
+                            
+                            <!-- Series Dinámicas -->
+                            <div id="contenedor-series-nmalos" style="display:none; margin-top:20px;">
+                                <label><strong>Series de Equipos *</strong> <span style="color:#666; font-weight:400; font-size:13px;">(Seleccione del stock del técnico)</span></label>
+                                <div id="inputs-series-nmalos" style="margin-top:10px;"></div>
+                            </div>
+                            
+                            <!-- Fecha -->
+                            <div class="form-group" id="grupo-fecha-nmalos" style="display:none; margin-top:20px;">
+                                <label for="fecha-nmalos"><strong>Fecha *</strong></label>
+                                <input type="date" id="fecha-nmalos" class="form-control" style="max-width:200px;">
+                            </div>
+                            
+                            <!-- Observación -->
+                            <div class="form-group" id="grupo-observacion-nmalos" style="display:none; margin-top:15px;">
+                                <label for="observacion-nmalos">Observación</label>
+                                <textarea id="observacion-nmalos" class="form-control" rows="3" 
+                                        placeholder="Describa el motivo de la devolución..."></textarea>
+                            </div>
+                            
+                            <!-- Botón Registrar -->
+                            <button id="btn-registrar-nmalos" class="btn-primary" disabled 
+                                    onclick="registrarDevolucion('nmalos')" 
+                                    style="background:#dc3545; color:white; border:none; padding:12px 30px; border-radius:6px; cursor:pointer; font-size:15px; font-weight:600; margin-top:20px;">
+                                ✅ Registrar en Bodega Malos
+                            </button>
+                        </div>
+
+                        <!-- ==================== FORMULARIO REVERSA ==================== -->
+                        <div id="form-reversa" style="display:none; background:#e7f3ff; padding:25px; border-radius:8px; border-left:5px solid #007bff; margin-top:20px;">
+                            <h3 style="color:#007bff; margin-top:0;">🔄 Equipos Reversa (Retirados de Cliente)</h3>
+                            <p style="color:#666; font-size:13px; margin-bottom:20px;">
+                                📋 Seleccione el técnico para ver sus órdenes liquidadas con equipos pendientes de reversa.
+                            </p>
+                            
+                            <!-- Técnico -->
+                            <div class="form-group">
+                                <label for="tecnico-reversa"><strong>Técnico *</strong></label>
+                                <select id="tecnico-reversa" class="form-control" onchange="habilitarCantidad('reversa')">
+                                    <option value="">-- Seleccione técnico --</option>
+                                </select>
+                            </div>
+
+                            <!-- Órdenes liquidadas pendientes de reversa -->
+                            <div id="contenedor-ordenes-reversa" style="display:none; margin-top:20px;">
+                                <label><strong>📋 Órdenes con equipos pendientes de reversa:</strong></label>
+                                <div id="lista-ordenes-reversa" style="margin-top:10px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="panel-guia-salida" class="content-panel">
+                    <h2>Guía de Salida</h2>
+                    <div class="form-container">
+                        <p>Generar guía de salida para materiales asignados.</p>
+                        <button id="btn-generar-guia" class="btn-excel">📄 Generar Guía</button>
+                    </div>
+                </div>
+                <div id="panel-inventario" class="content-panel">
+                    <h2>Inventario General</h2>
+                    <div class="tabla-container">
+                        <table id="tabla-inventario">
+                            <thead>
+                                <tr>
+                                    <th>Material</th>
+                                    <th>Tipo</th>
+                                    <th>Bodega</th>
+                                    <th>Cantidad</th>
+                                    <th>Seriados</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="panel-bodega-malos" class="content-panel">
+                    <h2>Bodega de Materiales en Mal Estado</h2>
+                    <div class="tabla-container">
+                        <table id="tabla-bodega-malos">
+                            <thead>
+                                <tr>
+                                    <th>Material</th>
+                                    <th>Serie</th>
+                                    <th>Fecha Ingreso</th>
+                                    <th>Origen</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="panel-bodega-reversa" class="content-panel">
+                    <h2>Bodega de Reversa</h2>
+                    <div class="tabla-container">
+                        <table id="tabla-bodega-reversa">
+                            <thead>
+                                <tr>
+                                <th>Material</th>
+                                <th>Cantidad</th>
+                                <th>Fecha Ingreso</th>
+                                <th>Proveedor</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="panel-gestion-equipos" class="content-panel">
+                    <h2>Gestión Equipos y Tarjetas</h2>
+                    <div class="form-container">
+                        <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                            <button id="btn-crear-seriado" class="btn-excel">➕ Crear Equipo</button>
+                            <button id="btn-crear-ferreteria" class="btn-excel">➕ Crear Tarjeta</button>
+                            <button id="btn-crear-LNB" class="btn-excel">➕ Crear LNB</button>
+                        </div>
+                        <form id="form-crear-lnb" style="display: none; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                            <input type="hidden" id="tipo-articulo-lnb" value="lnb">
+                            <div class="form-group">
+                                <label for="articulo-nombre-lnb">Nombre del LNB:</label>
+                                <input type="text" id="articulo-nombre-lnb" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="articulo-codigo-lnb">Código Único:</label>
+                                <input type="text" id="articulo-codigo-lnb" required>
+                            </div>
+                            <div class="form-group full-width">
+                                <button type="submit">💾 Guardar LNB</button>
+                                <button type="button" id="btn-cancelar-crear-lnb" style="margin-left: 10px; background: #6c757d; color: white;">Cancelar</button>
+                            </div>
+                            </form>
+                        <form id="form-crear-articulo" style="display: none; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                            <input type="hidden" id="tipo-articulo">
+                            <div class="form-group">
+                                <label for="articulo-nombre">Nombre del artículo:</label>
+                                <input type="text" id="articulo-nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="articulo-codigo">Código Único:</label>
+                                <input type="text" id="articulo-codigo" required>
+                            </div>
+                            <div class="form-group full-width">
+                                <button type="submit">💾 Guardar Artículo</button>
+                                <button type="button" id="btn-cancelar-crear" style="margin-left: 10px; background: #6c757d; color: white;">Cancelar</button>
+                            </div>
+                        </form>
+                        <div style="margin-top: 30px;">
+                            <h3>Equipos y Tarjetas Registrados</h3>
+                            <div class="tabla-container">
+                                <table id="tabla-gestion-articulos">
+                                    <thead>
+                                        <tr>
+                                            <th>Tipo</th>
+                                            <th>Nombre</th>
+                                            <th>Código</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="panel-buscar-serie" class="content-panel">
+                    <h2>Buscar Serie</h2>
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label for="input-buscar-serie">Ingrese número de serie:</label>
+                            <input type="text" id="input-buscar-serie" placeholder="Ej: SN123456 o SN789012">
+                            <button id="btn-buscar-serie">Buscar</button>
+                        </div>
+                        <div id="resultado-busqueda-serie" class="resultado-busqueda" style="margin-top: 20px;"></div>
+                    </div>
+                </div>
+                <div id="panel-saldo-tecnico" class="content-panel">
+                    <h2>Saldo Técnico</h2>
+                    <div class="form-container">
+                        <div style="display: flex; align-items: center; background-color: #002d5a; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                        <div style="flex: 1; display: flex; align-items: center;">
+                            <label for="filtro-tecnico-saldo" style="color: white; margin-right: 10px; font-weight: 600;">Seleccione Técnico:</label>
+                            <select id="filtro-tecnico-saldo" style="color: #333; background: white; border: none; border-radius: 4px; padding: 5px 10px; width: 100%; max-width: 300px;"></select>
+                        </div>
+                        <button id="btnExportarExcelSaldo" class="btn-excel" style="background: linear-gradient(135deg, #28a745, #20c997); border: none; color: white; font-weight: 600; padding: 10px 20px; border-radius: 8px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3); margin-left: 15px;">
+                            <i class="fas fa-file-excel"></i> Exportar Excel
+                        </button>
+                        </div>
+                        <div id="resumen-saldo-tecnico"></div>
+                        <div id="resumen-saldo" style="margin-top: 20px; margin-bottom: 20px;">
+                            <h3>Stock Asignado: <span id="total-asignado" style="color: #007bff; font-size: 1.5em; font-weight: bold;">0</span> ítems (Equipos/Tarjetas)</h3>
+                        </div>
+                        <div id="detalle-stock" style="margin-top: 10px;">
+                            <p style="text-align: center; color: #6c757d; margin-top: 40px;">Seleccione un técnico o "Todos" para ver el detalle del stock.</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="panel-editar-orden" class="content-panel" style="display:none;">
+                    <h2 id="titulo-editar-orden">Editar Orden</h2>
+                    <div class="form-container">
+                        <form id="form-editar-orden" onsubmit="guardarEdicionOrden(event)">
+                        <input type="hidden" id="editar-orden-id">
+                        <div class="form-group">
+                            <label for="editar-orden-rut">RUT:</label>
+                            <input type="text" id="editar-orden-rut" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editar-orden-nombre">Nombre:</label>
+                            <input type="text" id="editar-orden-nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editar-orden-direccion">Dirección:</label>
+                            <input type="text" id="editar-orden-direccion" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editar-numeroContacto">Teléfono:</label>
+                            <input type="text" id="editar-numeroContacto">
+                        </div>
+                        <div class="form-group">
+                            <label for="editar-orden-comuna">Comuna:</label>
+                            <select id="editar-orden-comuna" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editar-orden-servicio">Servicio:</label>
+                            <select id="editar-orden-servicio" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editar-orden-sub">Subservicio:</label>
+                            <select id="editar-orden-sub" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editar-orden-fecha">Fecha:</label>
+                            <input type="date" id="editar-orden-fecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editar-orden-tecnico">Técnico:</label>
+                            <select id="editar-orden-tecnico" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editar-orden-despacho">Despacho:</label>
+                            <select id="editar-orden-despacho" required></select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="editar-orden-observacion">Observaciones:</label>
+                            <textarea id="editar-orden-observacion"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit">💾 Guardar Cambios</button>
+                            <button type="button" onclick="mostrarPanel('panel-agendadas')" style="margin-left:10px; background:#6c757d;">← Volver</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="panel-gestion-bodega" class="content-panel">
+                    <h2>Gestión Bodega</h2>
+                    <div id="saldo-bodega-contenido" style="width: 98%; margin: 0 auto; padding: 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <label for="bodega-selector">Seleccione Bodega:</label>
+                                <select id="bodega-selector" style="padding: 8px 12px; font-size: 14px; border: 1px solid #ddd; border-radius: 6px;">
+                                    <option value="osorno">Osorno</option>
+                                    <option value="castro" disabled>Castro (próximamente)</option>
+                                </select>
+                            </div>
+                            <button id="exportarStockBodegaAExcel" class="btn-excel" style="padding: 10px 20px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">📊 Exportar a Excel</button>
+                        </div>
+                        <div class="tabla-container" style="overflow-x: auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 16px; /* 👈 Fuente más grande */">
+                                <thead>
+                                    <tr style="background-color: #002244; color: white; text-align: left; font-weight: bold;">
+                                        <th style="padding: 12px 16px; min-width: 150px; text-align: center;">Material</th>
+                                        <th style="padding: 12px 16px; min-width: 100px; text-align: center;">Tipo</th>
+                                        <th style="padding: 12px 16px; min-width: 150px; text-align: center;">Bodega</th>
+                                        <th style="padding: 12px 16px; min-width: 150px; text-align: center;">Asignado</th>
+                                        <th style="padding: 12px 16px; min-width: 150px; text-align: center;">Instalados</th>
+                                        <th style="padding: 12px 16px; min-width: 150px; text-align: center;">Total ingreso bodega</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-saldo-bodega"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="panel-gestion-orden" class="content-panel">
+                    <h2>Gestión de Órdenes</h2>
+                    <div class="form-container" style="margin-bottom: 30px;">
+                        <h3>🗑️ Eliminar Orden</h3>
+                        <div class="form-group">
+                            <label for="eliminar-orden-numero">N° Orden:</label>
+                            <input type="text" id="eliminar-orden-numero" placeholder="Ej: 123456">
+                            <button id="btn-eliminar-orden">Eliminar Orden</button>
+                        </div>
+                    </div>
+                    <div class="form-container">
+                        <h3>↩️ Reversar Orden (Liquidadas → Agendada)</h3>
+                        <div class="form-group">
+                            <label for="reversar-orden-numero">N° Orden liquidadas:</label>
+                            <input type="text" id="reversar-orden-numero" placeholder="Ej: 123456">
+                            <button id="btn-reversar-orden">Reversar Orden</button>
+                        </div>
+                    </div>
+                    <div class="form-container" style="margin-top: 30px; background: #fff8f8; border-left: 4px solid #dc3545;">
+                        <h3>🗑️ Eliminar Serie del Sistema</h3>
+                        <p style="color: #6c757d; margin-bottom: 15px;">
+                            Solo se pueden eliminar series que estén disponibles en bodega (no asignadas ni instaladas).
+                        </p>
+                        <div class="form-group">
+                            <label for="eliminar-serie-input">Número de Serie:</label>
+                            <input type="text" id="eliminar-serie-input" placeholder="Ej: 0200000006084BD9">
+                            <button id="btn-eliminar-serie-sistema" class="btn-excel" style="background: #dc3545;">Eliminar Serie</button>
+                        </div>
+                        <div id="resultado-eliminar-serie" style="margin-top: 15px;"></div>
+                    </div>
+                </div>                
+                <!-- ============================================ -->
+                <!-- PANEL DE REPORTES DE PRODUCCIÓN -->
+                <!-- ============================================ -->
+                <div id="reportes-produccion" class="content-panel" style="display: none;">
+                    <h2>📊 Reportes de Producción</h2>
+                    
+                    <!-- Filtros -->
+                    <div class="filtros-reporte" style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="margin-top: 0;">Filtros</h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <!-- Fecha Inicio -->
+                            <div>
+                                <label for="filtro-reporte-inicio">Fecha Inicio:</label>
+                                <input type="date" id="filtro-reporte-inicio" class="form-control">
+                            </div>
+                            
+                            <!-- Fecha Fin -->
+                            <div>
+                                <label for="filtro-reporte-fin">Fecha Fin:</label>
+                                <input type="date" id="filtro-reporte-fin" class="form-control">
+                            </div>
+                            
+                            <!-- Técnico -->
+                            <div>
+                                <label for="filtro-reporte-tecnico">Técnico:</label>
+                                <select id="filtro-reporte-tecnico" class="form-control">
+                                    <option value="">Todos los técnicos</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Servicio -->
+                            <div>
+                                <label for="filtro-reporte-servicio">Servicio:</label>
+                                <select id="filtro-reporte-servicio" class="form-control">
+                                    <option value="">Todos los servicios</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Estado -->
+                            <div>
+                                <label for="filtro-reporte-estado">Estado:</label>
+                                <select id="filtro-reporte-estado" class="form-control">
+                                    <option value="">Todos los estados</option>
+                                    <option value="Agendada">Agendada</option>
+                                    <option value="Liquidadas">Liquidadas</option>
+                                    <option value="Rechazada">Rechazada</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Botones -->
+                        <div style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button onclick="aplicarFiltrosReporte()" class="btn btn-primary">
+                                🔍 Generar Reporte
+                            </button>
+                            <button onclick="limpiarFiltrosReporte()" class="btn btn-secondary">
+                                🔄 Limpiar Filtros
+                            </button>
+                            <button onclick="exportarReporteProduccion()" class="btn btn-success">
+                                📥 Exportar a Excel
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Agregar ANTES de los filtros -->
+                        <div class="reporte-header" style="
+                            background: linear-gradient(135deg, #003366, #0056b3);
+                            color: white;
+                            padding: 20px;
+                            border-radius: 12px;
+                            margin-bottom: 20px;
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                            <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                                <div id="stat-total-ordenes" style="font-size: 2em; font-weight: bold;">0</div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">Total Órdenes</div>
+                            </div>
+                            <div style="text-align: center; padding: 10px; background: rgba(40,167,69,0.2); border-radius: 8px;">
+                                <div id="stat-liquidadas" style="font-size: 2em; font-weight: bold; color: #90EE90;">0</div>
+                                <div style="font-size: 0.9em;">✅ Liquidadas</div>
+                            </div>
+                            <div style="text-align: center; padding: 10px; background: rgba(220,53,69,0.2); border-radius: 8px;">
+                                <div id="stat-rechazadas" style="font-size: 2em; font-weight: bold; color: #FFB6C1;">0</div>
+                                <div style="font-size: 0.9em;">❌ Rechazadas</div>
+                            </div>
+                            <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                                <div id="stat-eficiencia" style="font-size: 2em; font-weight: bold;">0%</div>
+                                <div style="font-size: 0.9em;">Eficiencia</div>
+                            </div>
+                        </div>
+                    <!-- Contenedor de resultados -->
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">                        
+                        <!-- Tabla de resultados -->
+                        <div class="tabla-reporte-container" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h3>📋 Producción por Técnico</h3>
+                            
+                            <div style="overflow-x: auto;">
+                                <table class="tabla-ordenes">
+                                    <thead>
+                                        <tr>
+                                            <th>Técnico</th>
+                                            <th style="text-align: center;">Total Órdenes</th>
+                                            <th style="text-align: center;">Porcentaje</th>
+                                            <th style="text-align: center;">Agendadas</th>
+                                            <th style="text-align: center;">Liquidadas</th>
+                                            <th style="text-align: center;">Rechazadas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabla-reporte-produccion">
+                                        <tr>
+                                            <td colspan="6" style="text-align: center; padding: 30px; color: #666;">
+                                                📊 Selecciona filtros y haz clic en "Generar Reporte"
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Gráfico -->
+                        <div class="grafico-reporte-container" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h3>📈 Gráfico de Producción</h3>
+                            <div style="position: relative; height: 400px;">
+                                <canvas id="grafico-reporte-produccion"></canvas>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div id="customModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="modalMessage">¿Desea asignar material a otro técnico?</p>
+            <div class="modal-buttons">
+                <button id="modalAccept" class="btn btn-primary">Aceptar</button>
+                <button id="modalCancel" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <div id="modal-liquidacion" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; overflow-y:auto; justify-content:center; align-items:flex-start; padding:20px; box-sizing:border-box;">
+        <div style="background:white; border-radius:12px; width:100%; max-width:1100px; margin:auto; padding:30px; box-shadow:0 10px 40px rgba(0,0,0,0.2); position:relative;">
+            
+            <!-- Cerrar -->
+            <span id="cerrar-modal-liquidacion" style="position:absolute; top:15px; right:20px; font-size:24px; cursor:pointer; color:#999; font-weight:bold;">&times;</span>
+            
+            <!-- Título -->
+            <h3 style="margin:0 0 20px; color:#003366; font-size:1.3em; text-align:center; border-bottom:2px solid #007bff; padding-bottom:12px;">
+                Liquidar Orden #<span id="liquidar-numero-orden"></span>
+            </h3>
+
+            <!-- Validación -->
+            <div id="validacion-tecnico-despacho" style="display:none; background:#f8d7da; color:#721c24; padding:10px 15px; border-radius:6px; margin-bottom:15px; font-weight:600;">
+                ❌ La orden debe tener Técnico y Despacho asignados.
+            </div>
+
+            <!-- FILA: Nombre + Teléfono + Coordenadas -->
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px; margin-bottom:20px;">
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <label for="nombre-recibe" style="font-weight:600; font-size:13px; color:#333;">Nombre de quien recibe *</label>
+                    <input type="text" id="nombre-recibe" required placeholder="Nombre completo"
+                        style="padding:9px 12px; border:1px solid #ced4da; border-radius:6px; font-size:14px; width:100%; box-sizing:border-box;">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <label for="telefono-contacto" style="font-weight:600; font-size:13px; color:#333;">Teléfono *</label>
+                    <input type="text" id="telefono-contacto" required placeholder="9 1234 5678"
+                        style="padding:9px 12px; border:1px solid #ced4da; border-radius:6px; font-size:14px; width:100%; box-sizing:border-box;">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <label for="coordenadas" style="font-weight:600; font-size:13px; color:#333;">Coordenadas *</label>
+                    <input type="text" id="coordenadas" placeholder="-33.45, -70.65"
+                        style="padding:9px 12px; border:1px solid #ced4da; border-radius:6px; font-size:14px; width:100%; box-sizing:border-box;">
+                </div>
+            </div>
+
+            <!-- Series (decos, tarjetas, LNB, retirados) -->
+            <div id="contenedor-series" style="margin-bottom:20px;"></div>
+
+            <!-- Ferretería -->
+            <div id="contenedor-ferreteria" style="background:#f8f9fa; border:1px solid #dee2e6; border-radius:10px; padding:15px 20px; margin-bottom:20px;">
+                <h4 style="margin:0 0 12px; color:#003366; font-size:1em; font-weight:700; border-bottom:2px solid #007bff; padding-bottom:8px;">🔧 Ferretería Utilizada</h4>
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px;">
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-weight:600; font-size:13px; color:#333;">Conectores:</label>
+                        <input type="number" id="ferreteria-conectores" placeholder="Ej: 4" min="0"
+                            style="padding:8px 10px; border:1px solid #ced4da; border-radius:6px; font-size:14px;">
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-weight:600; font-size:13px; color:#333;">LNB:</label>
+                        <select id="ferreteria-lnb" style="padding:8px 10px; border:1px solid #ced4da; border-radius:6px; font-size:14px;">
+                            <option value="">-- Seleccione --</option>
+                            <option value="Quad">Quad</option>
+                            <option value="Dual">Dual</option>
+                            <option value="Movistar">Movistar</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-weight:600; font-size:13px; color:#333;">Cable (metros):</label>
+                        <input type="number" id="ferreteria-cable" placeholder="Ej: 25" min="0" step="0.5"
+                            style="padding:8px 10px; border:1px solid #ced4da; border-radius:6px; font-size:14px;">
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-weight:600; font-size:13px; color:#333;">Antena:</label>
+                        <select id="ferreteria-antena" style="padding:8px 10px; border:1px solid #ced4da; border-radius:6px; font-size:14px;">
+                            <option value="">-- Seleccione --</option>
+                            <option value="Si">Sí</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Código de Pérdida (opcional) -->
+            <div style="margin-bottom:15px;">
+                <label for="liquidacion-codigo-perdida" style="font-weight:600; font-size:13px; color:#856404; display:block; margin-bottom:5px;">
+                    📋 Código de Pérdida <span style="font-weight:400; color:#999;">(opcional)</span>
+                </label>
+                <input type="text" id="liquidacion-codigo-perdida" placeholder="Ej: PERD-2026-001"
+                    style="width:100%; padding:9px 12px; border:1px solid #ffc107; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fffdf0;">
+            </div>
+
+            <!-- Observaciones -->
+            <div style="margin-bottom:20px;">
+                <label for="liquidacion-observacion" style="font-weight:600; font-size:13px; color:#333; display:block; margin-bottom:5px;">Observaciones (obligatorio):</label>
+                <textarea id="liquidacion-observacion" required
+                    placeholder="Ej: Cliente solicitó cambio de ubicación, equipo funcionando correctamente, etc."
+                    style="width:100%; height:80px; padding:10px; border:1px solid #ced4da; border-radius:6px; font-size:14px; box-sizing:border-box; resize:vertical;"></textarea>
+            </div>
+
+            <!-- Botones -->
+            <div style="display:flex; justify-content:center; gap:16px; padding-top:15px; border-top:1px solid #dee2e6;">
+                <button type="button" id="btn-cancelar-liquidacion"
+                    style="padding:11px 0; width:200px; background:#6c757d; color:white; border:none; border-radius:6px; cursor:pointer; font-size:15px; font-weight:600;">
+                    Cancelar
+                </button>
+                <button type="button" id="btn-confirmar-liquidacion"
+                    style="padding:11px 0; width:200px; background:#007bff; color:white; border:none; border-radius:6px; cursor:pointer; font-size:15px; font-weight:600;">
+                    ✅ Liquidar Orden
+                </button>
+            </div>
+        </div>
+    </div>    
+    <!-- ======================================================= -->
+    <!-- 📦 DEPENDENCIAS EXTERNAS (Ordenadas y corregidas) -->
+    <!-- ======================================================= -->
+
+    <!-- 1. jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" 
+            crossorigin="anonymous"></script>
+
+    <!-- 2. jQuery UI -->
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" 
+            crossorigin="anonymous"></script>
+
+    <!-- 3. Tabulator -->
+    <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+
+    <!-- 4. Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- 5. SheetJS / XLSX (SIN integrity para evitar errores) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- 6. PivotTable.js -->
+    <script src="https://cdn.jsdelivr.net/npm/pivottable@2.23.0/dist/pivot.min.js"></script>
+
+    <!-- 7. EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+        emailjs.init("jzFJsfyQK4_babi6V");
+        console.log('✅ EmailJS inicializado');
+    </script>
+
+    <!-- 8. Supabase SDK (UMD version para navegador) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+
+    <!-- ======================================================= -->
+    <!-- ⚙️ CONFIGURACIÓN Y APLICACIÓN -->
+    <!-- ======================================================= -->
+
+    <!-- 9. Configuración global -->
+    <script src="config.js"></script>
+
+    <!-- 10. Inicializar cliente Supabase (DEBE ir antes que app.js) -->
+    <script>
+        // Esperar a que el SDK esté cargado
+        if (typeof window.supabase === 'undefined') {
+            console.error('❌ SDK de Supabase no cargado');
+        } else {
+            // Inicializar con credenciales de config.js
+            const url = window.CONFIG?.supabase?.url?.trim();
+            const key = window.CONFIG?.supabase?.anonKey?.trim();
+            
+            if (!url || !key) {
+                console.error('❌ Credenciales de Supabase faltantes');
+            } else {
+                window.supabaseClient = window.supabase.createClient(url, key);
+                console.log('✅ Supabase client inicializado');
+            }
+        }
+    </script>
+
+    <!-- 11. Script para fechas -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hoy = new Date().toISOString().split('T')[0];
+            ['fecha-nmalos', 'fecha-reversa', 'fecha-ingreso-seriados', 'fecha-ingreso-tarjetas', 'fecha-ingreso-lnb'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input && !input.value) input.value = hoy;
+            });
+        });
+    </script>
+
+    <!-- 12. Aplicación principal (SIN type="module") -->
+    <script src="app.js"></script>
+    </body>
+</html>
