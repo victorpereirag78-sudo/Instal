@@ -496,7 +496,7 @@ function login() {
         const tituloModulo = document.getElementById('titulo-modulo');
         
         if (imagenModulo) {
-            imagenModulo.src = 'img/instal.jpg';
+            imagenModulo.src = 'https://i.imgur.com/kHjXN3M.jpeg';
             imagenModulo.style.opacity = '1';
         }
         if (tituloModulo) {
@@ -515,8 +515,8 @@ function login() {
     const tituloModulo = document.getElementById('titulo-modulo');
 
     if (imagenModulo) {
-        imagenModulo.src = imgSrc;
-        imagenModulo.style.opacity = '1';
+            imagenModulo.src = 'https://i.imgur.com/kHjXN3M.jpeg';
+            imagenModulo.style.opacity = '1';
     }
     if (tituloModulo) {
         tituloModulo.textContent = 'Bienvenido al módulo de servicios ARM';
@@ -692,35 +692,35 @@ function mostrarPanel(panelId) {
                 let titulo = '';
                 switch (moduloActivo) {
                     case 'ingreso':
-                        imgSrc = 'img/instal.jpg';
+                        imgSrc = 'https://i.imgur.com/kHjXN3M.jpeg';
                         titulo = 'Ingreso de Clientes';
                         break;
                     case 'dth':
-                        imgSrc = 'img/instal.jpg';
+                        imgSrc = 'https://i.imgur.com/kHjXN3M.jpeg';
                         titulo = 'Operaciones de Terreno';
                         break;
                     case 'rrhh':
-                        imgSrc = 'img/instal.jpg';
+                        imgSrc = 'https://i.imgur.com/kHjXN3M.jpeg';
                         titulo = 'Recursos Humanos';
                         break;
                     case 'avance':
-                        imgSrc = 'img/instal.jpg';
+                        imgSrc = 'https://i.imgur.com/kHjXN3M.jpeg';
                         titulo = 'Reportes y Análisis';
                         break;
                     case 'logistica':
-                        imgSrc = 'img/instal.jpg';
+                        imgSrc = 'https://i.imgur.com/kHjXN3M.jpeg';
                         titulo = 'Gestión Logística';
                         break;
                     case 'gestion-orden':
-                        imgSrc = 'img/instal.jpg';
+                        imgSrc = 'https://i.imgur.com/kHjXN3M.jpeg';
                         titulo = 'Gestión de ticket';                      
                         break;
                     default:                        
                         titulo = 'Bienvenido a Tu Empresa';
-                        imgSrc = 'img/instal.jpg';
+                        imgSrc = 'https://i.imgur.com/kHjXN3M.jpeg';
                 }
                 if (imagenModulo) {
-                    imagenModulo.src = imgSrc;
+                    imagenModulo.src = 'https://i.imgur.com/kHjXN3M.jpeg';
                     imagenModulo.style.opacity = '1';
                 }
                 if (tituloModulo) {
