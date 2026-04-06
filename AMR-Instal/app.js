@@ -496,7 +496,7 @@ function login() {
         const tituloModulo = document.getElementById('titulo-modulo');
         
         if (imagenModulo) {
-            imagenModulo.src = 'instal.jpg';
+            imagenModulo.src = 'img/instal.jpg';
             imagenModulo.style.opacity = '1';
         }
         if (tituloModulo) {
@@ -515,7 +515,7 @@ function login() {
     const tituloModulo = document.getElementById('titulo-modulo');
 
     if (imagenModulo) {
-        imagenModulo.src = window.location.origin + '/instal.jpg';
+        imagenModulo.src = imgSrc;
         imagenModulo.style.opacity = '1';
     }
     if (tituloModulo) {
@@ -692,32 +692,32 @@ function mostrarPanel(panelId) {
                 let titulo = '';
                 switch (moduloActivo) {
                     case 'ingreso':
-                        imgSrc = 'instal.jpg';
+                        imgSrc = 'img/instal.jpg';
                         titulo = 'Ingreso de Clientes';
                         break;
                     case 'dth':
-                        imgSrc = 'instal.jpg';
+                        imgSrc = 'img/instal.jpg';
                         titulo = 'Operaciones de Terreno';
                         break;
                     case 'rrhh':
-                        imgSrc = 'instal.jpg';
+                        imgSrc = 'img/instal.jpg';
                         titulo = 'Recursos Humanos';
                         break;
                     case 'avance':
-                        imgSrc = 'instal.jpg';
+                        imgSrc = 'img/instal.jpg';
                         titulo = 'Reportes y Análisis';
                         break;
                     case 'logistica':
-                        imgSrc = 'instal.jpg';
+                        imgSrc = 'img/instal.jpg';
                         titulo = 'Gestión Logística';
                         break;
                     case 'gestion-orden':
-                        imgSrc = 'instal.jpg';
+                        imgSrc = 'img/instal.jpg';
                         titulo = 'Gestión de ticket';                      
                         break;
                     default:                        
                         titulo = 'Bienvenido a Tu Empresa';
-                        imgSrc = 'instal.jpg';
+                        imgSrc = 'img/instal.jpg';
                 }
                 if (imagenModulo) {
                     imagenModulo.src = imgSrc;
