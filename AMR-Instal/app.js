@@ -415,40 +415,39 @@ function mostrarToast(mensaje, tipo = 'success') {
 function login() {
     const rutInput = document.getElementById('login-rut')?.value.trim();
     const pass = document.getElementById('login-pass')?.value;
-
+    
     // 1. Validación básica
     if (!rutInput || !pass) {
         return mostrarToast("RUT y contraseña son obligatorios.", "error");
     }
 
-    // 2. Normalizamos rut que el usuario escribió (Quitamos puntos y guiones)
+    // 2. Normalizamos RUT
     const rutLimpio = normalizarRut(rutInput);
 
-    // 3. Buscamos usuario comparando RUTs limpios
+    // 3. Buscamos usuario
     const usuario = appData.usuarios?.find(u => {
-    return normalizarRut(u.rut) === rutLimpio &&
-            (u.pass === pass || u.password === pass) &&
-            u.activo !== false; // ✅ Solo permite login si está activo
+        return normalizarRut(u.rut) === rutLimpio &&
+                (u.pass === pass || u.password === pass) &&
+                u.activo !== false;
     });
 
     if (!usuario) {
-    // Verificar si existe pero está inactivo
-    const existePeroInactivo = appData.usuarios?.some(u =>
-        normalizarRut(u.rut) === rutLimpio && u.activo === false
-    );
-    if (existePeroInactivo) {
-        return mostrarToast("🔒 Esta cuenta está desactivada. Contacte a RRHH.", "error");
-    }
-    return mostrarToast("RUT o contraseña incorrectos.", "error");
+        const existePeroInactivo = appData.usuarios?.some(u =>
+            normalizarRut(u.rut) === rutLimpio && u.activo === false
+        );
+        if (existePeroInactivo) {
+            return mostrarToast("🔒 Esta cuenta está desactivada. Contacte a RRHH.", "error");
+        }
+        return mostrarToast("RUT o contraseña incorrectos.", "error");
     }
 
     // ✅ Autenticación exitosa
     window.usuarioActivo = usuario;
-    
-    // 4. Reset de la Interfaz (UI)
+
+    // 4. Reset de la Interfaz
     const loginContainer = document.getElementById('login-container');
     const appContainer = document.getElementById('app-container');
-    
+
     if (loginContainer) loginContainer.style.display = 'none';
     if (appContainer) appContainer.style.display = 'flex';
 
@@ -459,15 +458,64 @@ function login() {
     // 5. Filtrar módulos según el rol
     filtrarModulosPorRol(usuario.rol, 'modulo-bienvenida');
 
-    // 6. Mostrar Panel de Bienvenida
+    // 6. Mostrar Panel de Bienvenida O redirigir si es técnico
+    const rolUsuario = usuario.rol?.toLowerCase() || '';
+    const esTecnico = rolUsuario.includes('tecnico') || rolUsuario.includes('técnico');
+
+    if (esTecnico) {
+        // ✅ TÉCNICO: Ir directo a Ingreso Cliente
+        console.log('🔧 Usuario técnico detectado - Redirigiendo a Ingreso...');
+        mostrarToast(`Bienvenido ${usuario.nombre} - Acceso directo a Ingreso`, "success");
+        
+        // Activar menú superior
+        document.querySelectorAll('#main-nav button').forEach(b => {
+            b.classList.remove('active');
+            if (b.dataset.module === 'ingreso') {
+                b.classList.add('active');
+            }
+        });
+        
+        // Activar submenú lateral
+        document.querySelectorAll('#sidebar .submenu').forEach(s => s.classList.remove('active'));
+        const submenuIngreso = document.getElementById('submenu-ingreso');
+        if (submenuIngreso) {
+            submenuIngreso.classList.add('active');
+        }
+        
+        // Mostrar panel de ingreso directamente
+        setTimeout(() => {
+            mostrarPanel('panel-ingreso-cliente');
+            resetFormularioOrden();
+        }, 300);
+    } else {
+        // ✅ OTROS ROLES: Mostrar bienvenida normal
+        mostrarPanel('modulo-bienvenida');
+        
+        // --- IMAGEN Y TEXTO FORZADO ---
+        const imagenModulo = document.getElementById('imagen-modulo');
+        const tituloModulo = document.getElementById('titulo-modulo');
+        
+        if (imagenModulo) {
+            imagenModulo.src = 'instal.jpg';
+            imagenModulo.style.opacity = '1';
+        }
+        if (tituloModulo) {
+            tituloModulo.textContent = 'Bienvenido al módulo de servicios ARM';
+            tituloModulo.style.opacity = '1';
+        }
+    }
+
+    mostrarToast(`Bienvenido, ${usuario.nombre}`, "success");
+
+    // 7. Para otros roles: Mostrar Panel de Bienvenida
     mostrarPanel('modulo-bienvenida');
 
-    // --- 7. BLOQUE DE IMAGEN Y TEXTO FORZADO ---
+    // --- IMAGEN Y TEXTO FORZADO ---
     const imagenModulo = document.getElementById('imagen-modulo');
     const tituloModulo = document.getElementById('titulo-modulo');
-    
+
     if (imagenModulo) {
-        imagenModulo.src = 'instal.jpg';
+        imagenModulo.src = window.location.origin + '/instal.jpg';
         imagenModulo.style.opacity = '1';
     }
     if (tituloModulo) {

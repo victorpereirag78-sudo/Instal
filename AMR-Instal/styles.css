@@ -2580,3 +2580,95 @@ label[for="filtro-tecnico-saldo"] {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* ======================================================= */
+/* === OPTIMIZACIÓN MÓVIL PARA INGRESO DE CLIENTES ===   */
+/* ======================================================= */
+
+/* Solo aplicamos esto en pantallas menores a 768px (Celulares y Tablets verticales) */
+@media (max-width: 768px) {
+
+    /* Cuando el panel de ingreso cliente está activo (visible) */
+    #panel-ingreso-cliente.active ~ #sidebar, 
+    #sidebar:has(~ #main-content > #panel-ingreso-cliente.active) {
+        display: none !important; /* Ocultamos el sidebar */
+    }
+
+    /* Forzamos a que el contenido principal ocupe el 100% */
+    #panel-ingreso-cliente.active ~ #main-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 15px !important; /* Menos padding para ganar espacio */
+    }
+    
+    /* Hacemos que el formulario interno también ocupe todo el ancho */
+    #panel-ingreso-cliente .form-container {
+        max-width: 100% !important;
+        box-shadow: none !important; /* Quitamos sombra para que se vea más limpio en pantalla chica */
+        padding: 10px !important;
+    }
+
+    /* Ajustamos los inputs para que sean fáciles de tocar con el dedo */
+    #panel-ingreso-cliente input,
+    #panel-ingreso-cliente select {
+        font-size: 16px !important; /* Evita que el iPhone haga zoom al escribir */
+        height: 44px !important;
+    }
+
+    /* Ponemos el label arriba del input en lugar de al lado */
+    #panel-ingreso-cliente .form-group {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        margin-bottom: 15px;
+    }
+
+    #panel-ingreso-cliente .form-group label {
+        margin-right: 0 !important;
+        margin-bottom: 5px !important;
+        width: 100% !important;
+    }
+
+    #panel-ingreso-cliente .form-group input,
+    #panel-ingreso-cliente .form-group select {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+/* === OPTIMIZACIÓN MÓVIL PARA MÓDULO DE BIENVENIDA === */
+@media (max-width: 768px) {
+    /* Cuando el módulo de bienvenida está activo */
+    #modulo-bienvenida.active ~ #sidebar,
+    #sidebar:has(~ #main-content > #modulo-bienvenida.active) {
+        display: none !important;
+    }
+    
+    #modulo-bienvenida.active ~ #main-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 20px !important;
+    }
+    
+    /* Ajustar imagen del logo */
+    #modulo-bienvenida #imagen-modulo {
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: 300px !important;
+        object-fit: contain !important;
+    }
+    
+    /* Texto de bienvenida más grande */
+    #modulo-bienvenida #titulo-modulo {
+        font-size: 1.5em !important;
+        text-align: center !important;
+        margin: 20px 0 !important;
+    }
+    
+    /* Información de usuario */
+    #modulo-bienvenida .usuario-info {
+        background: #f8f9fa !important;
+        padding: 15px !important;
+        border-radius: 8px !important;
+        margin: 15px 0 !important;
+    }
+}
