@@ -22,6 +22,7 @@
     </div>
     <div id="app-container" style="display: none;">
     <header id="main-header">
+        
         <nav id="main-nav">
             <!-- ✅ NUEVO: Menú independiente para Ingreso Clientes -->
             <button data-module="ingreso">Ingreso Clientes</button>
@@ -39,15 +40,7 @@
     
     <div id="content-wrapper">
         <aside id="sidebar">
-            <!-- ✅ NUEVO: Submenu exclusivo para Ingreso Clientes -->
-            <div id="submenu-ingreso" class="submenu">
-                <h2>Ingreso por tecnico</h2>
-                <ul>
-                    <li><button data-panel="panel-ingreso-cliente">Ingreso cliente</button></li>
-                </ul>
-            </div>
-            
-            <!-- ✅ Despacho - SIN "Ingreso cliente" -->
+            <!-- ✅ Despacho -->
             <div id="submenu-dth" class="submenu">
                 <h2>Despacho</h2>
                     <ul>                                          
@@ -90,8 +83,8 @@
                         <li><button data-panel="panel-gestion-bodega">Gestión Bodega</button></li>
                         <li><button data-panel="panel-transferencia">Transferencia de Materiales</button></li>
                         <li><button data-panel="panel-devolucion-equipos">Devolución de Equipos</button></li>
-                        <li><button data-panel="panel-guia-salida">Guía de Salida</button></li>
-                        <li><button data-panel="panel-inventario">Inventario</button></li>
+                        <!-- <li><button data-panel="panel-guia-salida">Guía de Salida</button></li> -->
+                        <!-- <li><button data-panel="panel-inventario">Inventario</button></li> -->
                         <li><button data-panel="panel-saldo-tecnico">Saldo Técnico</button></li>
                         <li><button data-panel="panel-gestion-equipos">Gestión Equipos</button></li>
                         <li><button data-panel="panel-buscar-serie">Buscar Serie</button></li>
@@ -144,11 +137,125 @@
                     </div>
                     
                 </div>
+                <!-- ======================================================= -->
+                <!-- PANELES DE GESTIÓN ORDEN                                -->
+                <!-- ======================================================= -->
+
+                <!-- Panel: Eliminar Orden -->
+                <div id="panel-eliminar-orden" class="content-panel">
+                    <div style="max-width:500px;">
+                        <h2 style="color:#002244; margin-bottom:20px;">🗑️ Eliminar Orden</h2>
+                        <div style="background:#fff3cd; border:1px solid #ffc107; border-radius:8px; padding:14px; margin-bottom:20px; font-size:13px; color:#856404;">
+                            ⚠️ Esta acción es <strong>irreversible</strong>. Solo se pueden eliminar órdenes sin equipos asignados.
+                        </div>
+                        <div style="background:#fff; padding:24px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+                            <label style="display:block; font-weight:600; color:#333; margin-bottom:8px;">N° de Orden a eliminar:</label>
+                            <input type="text" id="eliminar-orden-numero" placeholder="Ej: 123456"
+                                style="width:100%; padding:10px 12px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; margin-bottom:16px;">
+                            <button id="btn-eliminar-orden"
+                                style="width:100%; padding:12px; background:#dc3545; color:#fff; border:none; border-radius:6px; font-size:15px; font-weight:700; cursor:pointer;">
+                                🗑️ Eliminar Orden
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel: Reversar Orden -->
+                <div id="panel-reversar-orden" class="content-panel">
+                    <div style="max-width:500px;">
+                        <h2 style="color:#002244; margin-bottom:20px;">↩️ Reversar Orden</h2>
+                        <div style="background:#d1ecf1; border:1px solid #bee5eb; border-radius:8px; padding:14px; margin-bottom:20px; font-size:13px; color:#0c5460;">
+                            ℹ️ Reversar devuelve la orden al estado <strong>Agendada</strong>, liberando los recursos asignados.
+                        </div>
+                        <div style="background:#fff; padding:24px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+                            <label style="display:block; font-weight:600; color:#333; margin-bottom:8px;">N° de Orden a reversar:</label>
+                            <input type="text" id="reversar-orden-numero" placeholder="Ej: 123456"
+                                style="width:100%; padding:10px 12px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; margin-bottom:16px;">
+                            <button id="btn-reversar-orden"
+                                style="width:100%; padding:12px; background:#fd7e14; color:#fff; border:none; border-radius:6px; font-size:15px; font-weight:700; cursor:pointer;">
+                                ↩️ Reversar Orden
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel: Eliminar Serie -->
+                <div id="panel-eliminar-serie" class="content-panel">
+                    <div style="max-width:500px;">
+                        <h2 style="color:#002244; margin-bottom:20px;">🔴 Eliminar Serie</h2>
+                        <div style="background:#f8d7da; border:1px solid #f5c6cb; border-radius:8px; padding:14px; margin-bottom:20px; font-size:13px; color:#721c24;">
+                            ⚠️ Eliminar una serie la retira permanentemente del sistema y su stock asociado.
+                        </div>
+                        <div style="background:#fff; padding:24px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+                            <label style="display:block; font-weight:600; color:#333; margin-bottom:8px;">N° de Serie a eliminar:</label>
+                            <input type="text" id="eliminar-serie-input" placeholder="Ej: SN12345678"
+                                style="width:100%; padding:10px 12px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; margin-bottom:16px;">
+                            <div id="resultado-eliminar-serie" style="margin-bottom:12px;"></div>
+                            <button id="btn-eliminar-serie-sistema"
+                                style="width:100%; padding:12px; background:#dc3545; color:#fff; border:none; border-radius:6px; font-size:15px; font-weight:700; cursor:pointer;">
+                                🔴 Eliminar Serie
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel: Bitácora -->
+                <div id="panel-bitacora" class="content-panel">
+                    <h2 style="color:#002244; margin-bottom:20px;">📋 Bitácora del Sistema</h2>
+                    <!-- Filtros -->
+                    <div style="background:#003366; padding:16px; border-radius:10px; margin-bottom:20px; display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;">
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#fff;">Tipo</label>
+                            <select id="bitacora-filtro-tipo" style="padding:8px 10px; border:1px solid #ddd; border-radius:6px; font-size:13px; min-width:160px;">
+                                <option value="">-- Todos --</option>
+                                <option value="asignacion">Asignación</option>
+                                <option value="ingreso_bodega">Ingreso Bodega</option>
+                                <option value="carga_masiva">Carga Masiva</option>
+                                <option value="eliminacion_serie">Eliminación Serie</option>
+                                <option value="eliminacion_orden">Eliminación Orden</option>
+                                <option value="reversa_orden">Reversa Orden</option>
+                                <option value="transferencia">Transferencia</option>
+                                <option value="reversa_equipo">Reversa Equipo</option>
+                                <option value="devolucion_nmalos">Devolución Malos</option>
+                            </select>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#fff;">Usuario</label>
+                            <input type="text" id="bitacora-filtro-usuario" placeholder="Filtrar por usuario"
+                                style="padding:8px 10px; border:1px solid #ddd; border-radius:6px; font-size:13px; min-width:140px;">
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#fff;">Desde</label>
+                            <input type="date" id="bitacora-filtro-desde"
+                                style="padding:8px 10px; border:1px solid #ddd; border-radius:6px; font-size:13px;">
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <label style="font-size:12px; font-weight:600; color:#fff;">Hasta</label>
+                            <input type="date" id="bitacora-filtro-hasta"
+                                style="padding:8px 10px; border:1px solid #ddd; border-radius:6px; font-size:13px;">
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <button onclick="renderBitacora()"
+                                style="padding:9px 20px; background:#28a745; color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:700; cursor:pointer;">
+                                🔍 Filtrar
+                            </button>
+                            <button onclick="limpiarFiltrosBitacora()"
+                                style="padding:9px 16px; background:#6c757d; color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;">
+                                Limpiar
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Contenido -->
+                    <div id="bitacora-contenido" style="background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.06); padding:20px; min-height:200px;">
+                        <p style="color:#888; text-align:center; padding:30px;">Selecciona filtros y presiona <strong>Filtrar</strong> para ver los registros.</p>
+                    </div>
+                </div>
+
                 <div id="panel-avance" class="content-panel">
                     <h1>Reportes</h1>
                     <p>Seleccione una opción del menú lateral para generar reportes.</p>
                 </div>
-                <div id="panel-ingreso-cliente" class="content-panel" style="display: none;">
+                <div id="panel-ingreso-cliente" class="content-panel">
                     <h2 id="titulo-ingreso-orden" style="margin: 0 0 16px 0; font-size: 1.2rem; color: #1a2a4a;">📝 Ingreso Orden</h2>
                     <div style="max-width: 860px; width: 100%;">
                         <form id="form-ingreso-orden" style="display: block;">

@@ -2635,35 +2635,6 @@ label[for="filtro-tecnico-saldo"] {
     }
 }
 
-/* === OPTIMIZACIÓN MÓVIL PARA MÓDULO DE BIENVENIDA === */
-@media (max-width: 768px) {
-    /* Cuando el módulo de bienvenida está activo */
-    #modulo-bienvenida.active ~ #sidebar,
-    #sidebar:has(~ #main-content > #modulo-bienvenida.active) {
-        display: none !important;
-    }
-    
-    #modulo-bienvenida.active ~ #main-content {
-        width: 100% !important;
-        max-width: 100% !important;
-        padding: 20px !important;
-    }
-    
-    /* Ajustar imagen del logo */
-    #modulo-bienvenida #imagen-modulo {
-        max-width: 100% !important;
-        height: auto !important;
-        max-height: 300px !important;
-        object-fit: contain !important;
-    }
-    
-    /* Texto de bienvenida más grande */
-    #modulo-bienvenida #titulo-modulo {
-        font-size: 1.5em !important;
-        text-align: center !important;
-        margin: 20px 0 !important;
-    }
-    
     /* Información de usuario */
     #modulo-bienvenida .usuario-info {
         background: #f8f9fa !important;
@@ -2671,4 +2642,253 @@ label[for="filtro-tecnico-saldo"] {
         border-radius: 8px !important;
         margin: 15px 0 !important;
     }
+
+
+/* Asegurar que las imágenes se muestren */
+#imagen-modulo {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
+
+/* === sidebar siempre visible, sin menú hamburguesa === */
+/* ============================================
+   SIDEBAR MÓVIL — REGLAS DEFINITIVAS
+   - Visible en todos los módulos
+   - Oculto solo cuando body tiene .modulo-ingreso
+   ============================================ */
+@media (max-width: 768px) {
+    .menu-toggle,
+    #sidebar-overlay,
+    .sidebar-close {
+        display: none !important;
+    }
+
+    /* Sidebar visible por defecto en móvil */
+    #sidebar {
+        width: 180px !important;
+        min-width: 180px !important;
+        padding: 10px !important;
+        flex-shrink: 0 !important;
+        display: block !important;
+    }
+
+    /* Submenús respetan la clase active */
+    #sidebar .submenu {
+        display: none !important;
+    }
+    #sidebar .submenu.active {
+        display: block !important;
+    }
+    #sidebar .submenu.active h2,
+    #sidebar .submenu.active h3,
+    #sidebar .submenu.active ul,
+    #sidebar .submenu.active li {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    #sidebar .submenu.active li button {
+        display: block !important;
+        width: 100% !important;
+        padding: 12px 10px !important;
+        color: #e0e0e0 !important;
+        background: none !important;
+        border: none !important;
+        text-align: left !important;
+        font-size: 14px !important;
+        cursor: pointer !important;
+        white-space: normal !important;
+    }
+    #sidebar .submenu.active li button:hover {
+        background-color: #0056b3 !important;
+        color: white !important;
+    }
+
+    /* Cuando el módulo es Ingreso Clientes: ocultar sidebar completamente */
+    body.modulo-ingreso #sidebar {
+        display: none !important;
+    }
+    body.modulo-ingreso #main-content {
+        width: 100% !important;
+    }
+}
+
+/* Desktop: sidebar siempre fijo a la izquierda */
+@media (min-width: 769px) {
+    #sidebar {
+        position: relative !important;
+        left: 0 !important;
+        width: 240px !important;
+        transform: none !important;
+        display: block !important;
+    }
+    .menu-toggle,
+    #sidebar-overlay {
+        display: none !important;
+    }
+    #main-content {
+        width: calc(100% - 240px) !important;
+        transform: none !important;
+    }
+}
+
+/* Fin de estilos sidebar */
+
+/* === FIX: Asegurar que el sidebar muestre su contenido en móviles === */
+@media (max-width: 768px) {
+    #sidebar {
+        /* Asegurar que tenga altura suficiente */
+        height: calc(100vh - 60px) !important;
+        
+        /* Permitir scroll si hay mucho contenido */
+        overflow-y: auto !important;
+        
+        /* Asegurar que el contenido sea visible */
+        visibility: visible !important;
+        
+        /* Forzar a que se muestre el contenido */
+        z-index: 1000 !important;
+    }
+    
+    #sidebar.active {
+        left: 0 !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    /* Asegurar que los elementos del menú sean visibles */
+    #sidebar ul,
+    #sidebar .submenu {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    #sidebar li,
+    #sidebar li button {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        height: auto !important;
+        padding: 10px 15px !important;
+    }
+}
+
+/* ============================================= */
+/* MENÚ LATERAL MÓVIL - VERSIÓN DEFINITIVA       */
+/* ============================================= */
+
+@media (max-width: 768px) {
+    /* Sidebar oculto por defecto a la izquierda */
+    #sidebar {
+        position: fixed !important;
+        left: -290px !important;           /* Oculto */
+        top: 60px !important;
+        width: 280px !important;
+        height: calc(100vh - 60px) !important;
+        background-color: #003366 !important;
+        color: white !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        transition: left 0.35s ease !important;
+        z-index: 1050 !important;          /* Alto para que esté encima */
+        box-shadow: 4px 0 15px rgba(0,0,0,0.3) !important;
+        padding-top: 10px !important;
+    }
+
+    /* Sidebar visible */
+    #sidebar.active {
+        left: 0 !important;
+    }
+
+    /* Overlay oscuro */
+    #sidebar-overlay {
+        display: none !important;
+        position: fixed !important;
+        top: 60px !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: rgba(0,0,0,0.6) !important;
+        z-index: 1040 !important;
+    }
+
+    #sidebar-overlay.active {
+        display: block !important;
+    }
+
+    /* Botón hamburguesa siempre visible en móvil */
+    .menu-toggle {
+        display: block !important;
+        z-index: 1100 !important;
+    }
+
+    /* ⚠️ CLAVE: Solo el submenu ACTIVO se muestra, los demás quedan ocultos */
+    #sidebar .submenu {
+        display: none !important;
+    }
+
+    #sidebar .submenu.active {
+        display: block !important;
+    }
+
+    /* Elementos dentro del submenu activo */
+    #sidebar .submenu.active h2,
+    #sidebar .submenu.active h3,
+    #sidebar .submenu.active ul,
+    #sidebar .submenu.active li {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    #sidebar .submenu.active li button {
+        width: 100% !important;
+        padding: 14px 15px !important;
+        text-align: left !important;
+        font-size: 15px !important;
+        color: #e0e0e0 !important;
+    }
+
+    #sidebar li button:hover,
+    #sidebar li button.active {
+        background-color: #0056b3 !important;
+        color: white !important;
+    }
+
+    /* El contenido principal se mueve cuando el menú está abierto (opcional pero queda más pro) */
+    #main-content {
+        transition: transform 0.35s ease !important;
+    }
+
+    #sidebar.active ~ #main-content {
+        transform: translateX(280px) !important;
+    }
+}
+
+/* En desktop siempre visible y sin overlay */
+@media (min-width: 769px) {
+    #sidebar {
+        position: relative !important;
+        left: 0 !important;
+        width: 240px !important;   /* o 280px según prefieras */
+        transform: none !important;
+        display: block !important;
+    }
+
+    .menu-toggle,
+    #sidebar-overlay {
+        display: none !important;
+    }
+
+    #main-content {
+        width: calc(100% - 240px) !important;
+        transform: none !important;
+    }
+}
+
+/* Desktop: sidebar siempre visible, sin overlay */
+
+/* Fin de estilos del sidebar móvil */

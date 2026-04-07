@@ -463,67 +463,19 @@ function login() {
     const esTecnico = rolUsuario.includes('tecnico') || rolUsuario.includes('técnico');
 
     if (esTecnico) {
-        // ✅ TÉCNICO: Ir directo a Ingreso Cliente
-        console.log('🔧 Usuario técnico detectado - Redirigiendo a Ingreso...');
-        mostrarToast(`Bienvenido ${usuario.nombre} - Acceso directo a Ingreso`, "success");
-        
-        // Activar menú superior
+        // TÉCNICO: marcar el módulo ingreso como activo visualmente, pero mostrar bienvenida
         document.querySelectorAll('#main-nav button').forEach(b => {
             b.classList.remove('active');
-            if (b.dataset.module === 'ingreso') {
-                b.classList.add('active');
-            }
+            if (b.dataset.module === 'ingreso') b.classList.add('active');
         });
-        
-        // Activar submenú lateral
         document.querySelectorAll('#sidebar .submenu').forEach(s => s.classList.remove('active'));
-        const submenuIngreso = document.getElementById('submenu-ingreso');
-        if (submenuIngreso) {
-            submenuIngreso.classList.add('active');
-        }
-        
-        // Mostrar panel de ingreso directamente
-        setTimeout(() => {
-            mostrarPanel('panel-ingreso-cliente');
-            resetFormularioOrden();
-        }, 300);
-    } else {
-        // ✅ OTROS ROLES: Mostrar bienvenida normal
+        mostrarToast(`Bienvenido, ${usuario.nombre}`, "success");
         mostrarPanel('modulo-bienvenida');
-        
-        // --- IMAGEN Y TEXTO FORZADO ---
-        const imagenModulo = document.getElementById('imagen-modulo');
-        const tituloModulo = document.getElementById('titulo-modulo');
-        
-        if (imagenModulo) {
-            imagenModulo.src = 'https://i.imgur.com/kHjXN3M.jpeg';
-            imagenModulo.style.opacity = '1';
-        }
-        if (tituloModulo) {
-            tituloModulo.textContent = 'Bienvenido al módulo de servicios ARM';
-            tituloModulo.style.opacity = '1';
-        }
+    } else {
+        // OTROS ROLES: Mostrar bienvenida normal
+        mostrarToast(`Bienvenido, ${usuario.nombre}`, "success");
+        mostrarPanel('modulo-bienvenida');
     }
-
-    mostrarToast(`Bienvenido, ${usuario.nombre}`, "success");
-
-    // 7. Para otros roles: Mostrar Panel de Bienvenida
-    mostrarPanel('modulo-bienvenida');
-
-    // --- IMAGEN Y TEXTO FORZADO ---
-    const imagenModulo = document.getElementById('imagen-modulo');
-    const tituloModulo = document.getElementById('titulo-modulo');
-
-    if (imagenModulo) {
-            imagenModulo.src = 'https://i.imgur.com/kHjXN3M.jpeg';
-            imagenModulo.style.opacity = '1';
-    }
-    if (tituloModulo) {
-        tituloModulo.textContent = 'Bienvenido al módulo de servicios ARM';
-        tituloModulo.style.opacity = '1';
-    }
-
-    mostrarToast(`Bienvenido, ${usuario.nombre}`, "success");
 }
 
 function filtrarModulosPorRol(rol, panelIdActual = null) {
@@ -558,13 +510,11 @@ function filtrarModulosPorRol(rol, panelIdActual = null) {
         }
     });
 
-    // 👇 Activa automáticamente el PRIMER módulo visible
+    // Solo marcar visualmente el primer botón visible, SIN navegar
     const primerBotonVisible = document.querySelector('#main-nav button[data-module]:not([style*="display: none"])');
     if (primerBotonVisible) {
         document.querySelectorAll('#main-nav button').forEach(b => b.classList.remove('active'));
         primerBotonVisible.classList.add('active');
-        const moduloId = primerBotonVisible.dataset.module;
-        seleccionarModulo(moduloId);
     }
     
     return true;
@@ -579,6 +529,21 @@ function seleccionarModulo(moduloId) {
     document.querySelectorAll('#main-nav button').forEach(b => b.classList.remove('active'));
     const botonActivo = document.querySelector(`#main-nav button[data-module="${moduloId}"]`);
     if (botonActivo) botonActivo.classList.add('active');
+
+    // Controlar visibilidad del sidebar en móvil según módulo
+    if (moduloId === 'ingreso') {
+        document.body.classList.add('modulo-ingreso');
+    } else {
+        document.body.classList.remove('modulo-ingreso');
+    }
+
+    // ✅ Ingreso Clientes: sin sidebar, va directo al formulario
+    if (moduloId === 'ingreso') {
+        document.querySelectorAll('#sidebar .submenu').forEach(s => s.classList.remove('active'));
+        mostrarPanel('panel-ingreso-cliente');
+        return;
+    }
+
     document.querySelectorAll('#sidebar .submenu').forEach(s => s.classList.remove('active'));
     const submenuActivo = document.getElementById(`submenu-${moduloId}`);
     if (submenuActivo) submenuActivo.classList.add('active');
@@ -587,7 +552,6 @@ function seleccionarModulo(moduloId) {
 
 function mostrarPanel(panelId) {
     const usuario = window.usuarioActivo;
-
     // ✅ VALIDAR ROL LECTOR - SOLO LECTURA
     if (usuario?.rol === 'lector') {
         const panelesBloqueados = [
@@ -604,6 +568,8 @@ function mostrarPanel(panelId) {
             'panel-devolucion-equipos'
         ];
         
+        cerrarSidebarSiEsMovil();
+
         if (panelesBloqueados.includes(panelId)) {
             mostrarToast("⛔ Rol 'Lector' solo tiene permisos de lectura.", "error");
             return;
@@ -621,29 +587,41 @@ function mostrarPanel(panelId) {
     if (panelReversarDespacho) {
         panelReversarDespacho.style.display = 'none';
     }
+
+    document.querySelectorAll('#main-content .content-panel').forEach(p => {
+        p.classList.remove('active');
+        p.style.display = 'none';
+    });
+
     const moduloRequerido = moduloPorPanel[panelId];
     if (moduloRequerido) {
-        if (!filtrarModulosPorRol(usuario?.rol || 'admin', panelId)) {
+        // Solo verificar permisos, sin redirigir ni llamar seleccionarModulo
+        const permisos = {
+            'admin':        ['ingreso', 'dth', 'rrhh', 'gestion-orden', 'avance', 'logistica'],
+            'rrhh':         ['rrhh'],
+            'despacho N1':  ['ingreso', 'dth'],
+            'despacho N2':  ['ingreso', 'dth', 'logistica'],
+            'logistica':    ['logistica'],
+            'lector':       ['dth', 'logistica', 'avance']
+        };
+        const rol = usuario?.rol || 'admin';
+        const modulosPermitidos = permisos[rol] || [];
+        if (!modulosPermitidos.includes(moduloRequerido)) {
+            mostrarToast("⚠️ No tienes permisos para acceder a esta sección.", "error");
             return;
-        }      
-    }
+        }
 
-    if (moduloRequerido) {
         // Activar el módulo correcto en el menú superior
         document.querySelectorAll('#main-nav button').forEach(b => {
             b.classList.remove('active');
-            if (b.dataset.module === moduloRequerido) {
-                b.classList.add('active');
-            }
+            if (b.dataset.module === moduloRequerido) b.classList.add('active');
         });
         
-        // Activar el submenu correcto en la barra lateral
-        document.querySelectorAll('#sidebar .submenu').forEach(s => {
-            s.classList.remove('active');
-        });
-        const submenuActivo = document.getElementById(`submenu-${moduloRequerido}`);
-        if (submenuActivo) {
-            submenuActivo.classList.add('active');
+        // Activar el submenu correcto en la barra lateral (excepto ingreso que no tiene submenu)
+        document.querySelectorAll('#sidebar .submenu').forEach(s => s.classList.remove('active'));
+        if (moduloRequerido !== 'ingreso') {
+            const submenuActivo = document.getElementById(`submenu-${moduloRequerido}`);
+            if (submenuActivo) submenuActivo.classList.add('active');
         }
     }
 
@@ -871,7 +849,7 @@ function mostrarPanel(panelId) {
             break;
 
         case 'panel-bitacora':
-            
+            renderBitacora();
             break;
 
         case 'panel-eliminar-orden':
@@ -7900,7 +7878,6 @@ function validarRutInput(inputElement) {
     }
 }
 
-
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // =======================================================
@@ -8058,7 +8035,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         renderTablaLiquidadas();
-    });
+        });
 
         safeAddListener('btnLimpiarFiltroLiquidas', 'click', function() {
             document.getElementById('filtro-liquida-inicio').value = '';
@@ -8411,6 +8388,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
     setupRutListeners();
+
+    if (window.innerWidth <= 768) {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+    }
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const menuToggle = document.querySelector('.menu-toggle');
+            if (sidebar) sidebar.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            if (menuToggle) menuToggle.innerHTML = '☰';
+        }
+    });
 
 });
     
@@ -12381,6 +12376,8 @@ window.marcarEnProceso = marcarEnProceso;
 window.cargarOrdenesReversaPendiente = cargarOrdenesReversaPendiente;
 window.abrirEdicionEmpleado = abrirEdicionEmpleado;
 window.editarEmpleado = abrirEdicionEmpleado; //
+window.renderBitacora = renderBitacora;
+window.limpiarFiltrosBitacora = limpiarFiltrosBitacora;
 
 
 async function renderBitacora() {
@@ -12510,4 +12507,29 @@ function limpiarFiltrosBitacora() {
     });
     const contenedor = document.getElementById('bitacora-contenido');
     if (contenedor) contenedor.innerHTML = '<p style="color:#888; text-align:center; padding:30px;">Selecciona filtros y presiona Filtrar para ver los registros.</p>';
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    if (!sidebar || !overlay) return;
+    
+    const isActive = sidebar.classList.toggle('active');
+    overlay.classList.toggle('active', isActive);
+    
+    // Cambiar ícono
+    const btn = document.querySelector('.menu-toggle');
+    if (btn) btn.textContent = isActive ? '✕' : '☰';
+    
+    console.log('Sidebar toggled → active:', isActive); // ← para debug
+}
+
+// Cerrar sidebar después de seleccionar una opción (solo en móviles)
+function cerrarSidebarSiEsMovil() {
+    if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('active');
+        document.getElementById('sidebar-overlay').classList.remove('active');
+        document.querySelector('.menu-toggle').innerHTML = '☰';
+    }
 }
