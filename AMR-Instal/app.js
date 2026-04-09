@@ -256,18 +256,6 @@ let asignacionActiva = {           // Estado actual de la asignación
         'panel-asignacion-materiales': 'logistica',
         'panel-bodega-malos': 'logistica',
         'panel-bodega-reversa': 'logistica',
-
-        // Dentro de appData:
-        flota: [],
-        panol: { herramientas: [], epp: [], uniformes: [] },
-
-        // Dentro de moduloPorPanel:
-        'panel-flota-km': 'flota',
-        'panel-flota-prox-revision': 'flota',
-        'panel-flota-actual': 'flota',
-        'panel-panol-herramientas': 'panol',
-        'panel-panol-epp': 'panol',
-        'panel-panol-uniformes': 'panol',
         
         // Reportes / Avance
         'reportes-produccion': 'avance',
@@ -5329,7 +5317,7 @@ async function buscarSerieEnSupabase(terminoNorm) {
             const encontrado = items.some(item => {
                 if (tipo === 'equipo') {
                     return normalizarSerie(item.serie1) === terminoNorm ||
-                        normalizarSerie(item.serie2) === terminoNorm;
+                            normalizarSerie(item.serie2) === terminoNorm;
                 }
                 return normalizarSerie(item.serie) === terminoNorm;
             });
@@ -8197,71 +8185,6 @@ function validarRutInput(inputElement) {
     }
 }
 
-// ================= FLORA =================
-async function renderFlota(vista) {
-    const tbody = document.getElementById(vista === 'km' ? 'tabla-flota-km' : vista === 'prox' ? 'tabla-flota-prox' : 'tabla-flota-actual');
-    if(!tbody) return;
-    
-    // Simula carga desde Supabase o appData
-    const datos = appData.flota || []; 
-    tbody.innerHTML = '';
-    
-    if(datos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px; text-align:center; color:#666;">No hay registros</td></tr>';
-        return;
-    }
-
-    datos.forEach(v => {
-        if(vista === 'km') {
-            tbody.innerHTML += `<tr><td style="padding:10px;">${v.patente}</td><td>${v.marca} ${v.modelo}</td><td>${v.km_actual}</td><td><span style="padding:4px 8px; border-radius:12px; font-size:12px; background:${v.estado==='Activo'?'#d1fae5':'#fee2e2'}">${v.estado}</span></td><td><button onclick="editarFlota('${v.id}')" style="color:#007bff; background:none; border:none; cursor:pointer;">✏️</button></td></tr>`;
-        } else if(vista === 'prox') {
-            const kmRestante = v.km_prox_revision - v.km_actual;
-            tbody.innerHTML += `<tr><td style="padding:10px;">${v.patente}</td><td>${v.marca} ${v.modelo}</td><td>${v.km_actual}</td><td>${v.km_prox_revision}</td><td>${kmRestante < 500 ? '⚠️ Urgente' : '✅ OK'}</td></tr>`;
-        } else {
-            tbody.innerHTML += `<tr><td style="padding:10px;">${v.patente}</td><td>${v.marca} ${v.modelo}</td><td style="font-weight:bold;">${v.km_actual} km</td><td>${v.ultima_actualizacion || '—'}</td></tr>`;
-        }
-    });
-}
-
-async function guardarFlota(datos) {
-    // Aquí va tu insert a Supabase
-    const { error } = await supabase.from('flota').insert([datos]);
-    if(error) return mostrarToast('❌ Error al guardar', 'error');
-    
-    appData.flota.push(datos);
-    renderFlota('km');
-    renderFlota('prox');
-    renderFlota('actual');
-    mostrarToast('✅ Vehículo registrado', 'success');
-    cerrarModales();
-}
-
-// ================= PAÑOL =================
-async function renderPañol(categoria) {
-    const tbody = document.getElementById(`tabla-panol-${categoria}`);
-    if(!tbody) return;
-    const datos = appData.panol[categoria] || [];
-    tbody.innerHTML = '';
-    if(datos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px; text-align:center; color:#666;">Sin stock</td></tr>';
-        return;
-    }
-    datos.forEach(p => {
-        tbody.innerHTML += `<tr><td style="padding:10px;">${p.nombre}</td><td>${p.codigo || p.talla}</td><td>${p.stock}</td><td>${p.ubicacion || p.vencimiento || p.entregados}</td><td><span style="padding:4px 8px; border-radius:12px; font-size:12px; background:${p.stock>0?'#d1fae5':'#fee2e2'}">${p.stock>0?'Disponible':'Agotado'}</span></td></tr>`;
-    });
-}
-
-async function guardarPañol(categoria, datos) {
-    const tabla = `panol_${categoria}`; // ej: panol_herramientas
-    const { error } = await supabase.from(tabla).insert([datos]);
-    if(error) return mostrarToast('❌ Error al guardar', 'error');
-    
-    appData.panol[categoria].push(datos);
-    renderPañol(categoria);
-    mostrarToast('✅ Item agregado al Pañol', 'success');
-    cerrarModales();
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // =======================================================
@@ -8785,41 +8708,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (menuToggle) menuToggle.innerHTML = '☰';
         }
     });
-    // Navegación Flota/Pañol
-    document.querySelectorAll('[data-panel^="panel-flota-"]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const view = btn.dataset.panel.replace('panel-flota-', '');
-            mostrarPanel(btn.dataset.panel);
-            renderFlota(view === 'km' ? 'km' : view === 'prox-revision' ? 'prox' : 'actual');
-        });
-    });
-
-    document.querySelectorAll('[data-panel^="panel-panol-"]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const cat = btn.dataset.panel.replace('panel-panol-', '');
-            mostrarPanel(btn.dataset.panel);
-            renderPañol(cat);
-        });
-    });
-
-    // Modales simples (puedes reutilizar tu modal genérico o crear uno rápido)
-    function abrirModalFlota() {
-        // Implementa tu modal aquí o usa prompt para prueba rápida
-        const patente = prompt("Patente:");
-        if(!patente) return;
-        guardarFlota({ patente, marca: 'Toyota', modelo: 'Hilux', km_actual: 45000, km_prox_revision: 50000, estado: 'Activo', ultima_actualizacion: new Date().toLocaleDateString() });
-    }
-
-    function abrirModalPañol(cat) {
-        const nombre = prompt("Nombre del item:");
-        if(!nombre) return;
-        guardarPañol(cat, { nombre, codigo: 'GEN-001', stock: 10, ubicacion: 'Estante A', estado: 'Disponible' });
-    }
-
-    function cerrarModales() {
-        // Cierra tu modal existente
-        document.querySelectorAll('.modal, .backdrop').forEach(el => el.style.display = 'none');
-    }
 
 });
 
