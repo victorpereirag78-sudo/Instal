@@ -6,6 +6,8 @@ const supabase = window.supabaseClient;
 
 
 
+
+
 function mostrarLoader(mensaje = 'Cargando...') {
     let loader = document.getElementById('global-loader');
     if (!loader) {
@@ -247,12 +249,25 @@ let asignacionActiva = {           // Estado actual de la asignación
         'panel-gestion-equipos': 'logistica',
         'panel-ingreso-seriados': 'logistica',
         'panel-ingreso-no-seriados': 'logistica',
+        'panel-eliminar-serie': 'logistica',
         'panel-gestion-bodega': 'logistica',
         'panel-saldo-tecnico': 'logistica',
         'panel-transferencia': 'logistica',
         'panel-asignacion-materiales': 'logistica',
         'panel-bodega-malos': 'logistica',
         'panel-bodega-reversa': 'logistica',
+
+        // Dentro de appData:
+        flota: [],
+        panol: { herramientas: [], epp: [], uniformes: [] },
+
+        // Dentro de moduloPorPanel:
+        'panel-flota-km': 'flota',
+        'panel-flota-prox-revision': 'flota',
+        'panel-flota-actual': 'flota',
+        'panel-panol-herramientas': 'panol',
+        'panel-panol-epp': 'panol',
+        'panel-panol-uniformes': 'panol',
         
         // Reportes / Avance
         'reportes-produccion': 'avance',
@@ -443,6 +458,7 @@ function login() {
 
     // ✅ Autenticación exitosa
     window.usuarioActivo = usuario;
+    sessionStorage.setItem('usuarioActivo', JSON.stringify(usuario));
 
     // 4. Reset de la Interfaz
     const loginContainer = document.getElementById('login-container');
@@ -945,7 +961,7 @@ function resetFormularioOrden() {
         form.style.display = 'block';
     }
 
-    // ✅ PASO NUEVO: Cargar servicios en el select
+    // Cargar servicios en el select
     cargarServiciosEnSelect();
 
     const numInput = document.getElementById('orden-numero');
@@ -953,19 +969,17 @@ function resetFormularioOrden() {
         numInput.value = '';
         numInput.disabled = false;
     }
-    
-    // ✅ PASO 3: Región oculta pero con valor "13" (Metropolitana)
+
+    // Región oculta pero con valor "13" (Metropolitana)
     const regionSelect = document.getElementById('orden-region');
     if (regionSelect) {
-        regionSelect.value = '13';  // ✅ Siempre Metropolitana
-        // Opcional: ocultar visualmente si es un select
+        regionSelect.value = '13';
         regionSelect.closest('.form-group')?.style.setProperty('display', 'none', 'important');
     }
-    
-    // ✅ PASO 4: Comuna se carga automáticamente para RM
+
+    // Comuna se carga automáticamente para RM
     const comunaSelect = document.getElementById('orden-comuna');
     if (comunaSelect) {
-        // Cargar comunas de Región Metropolitana (key "13")
         const comunasRM = appData.regiones["13"]?.comunas || [];
         comunaSelect.innerHTML = '<option value="">-- Seleccione Comuna --</option>';
         comunasRM.forEach(comuna => {
@@ -975,69 +989,104 @@ function resetFormularioOrden() {
             comunaSelect.appendChild(opt);
         });
     }
-    
-    // ✅ PASO 5: Subservicio limpio
+
+    // Subservicio limpio
     const subServicioSelect = document.getElementById('orden-sub');
     if (subServicioSelect) {
         subServicioSelect.innerHTML = '<option value="">-- Seleccione Subservicio --</option>';
     }
-    
-    // ✅ PASO 6: Técnico auto-seleccionado si el usuario es técnico
+
+    // ✅ TÉCNICO AUTO-ASIGNADO (usuario logueado)
     const tecnicoSelect = document.getElementById('orden-tecnico');
     if (tecnicoSelect && window.usuarioActivo) {
         const nombreUsuario = window.usuarioActivo.nombre;
-        // Buscar si el usuario está en la lista de técnicos
-        const tecnicosDisponibles = Array.from(tecnicoSelect.options)
-            .map(opt => opt.value)
-            .filter(v => v);
-        
-        if (tecnicosDisponibles.includes(nombreUsuario)) {
-            tecnicoSelect.value = nombreUsuario;  // ✅ Auto-seleccionar
-        }
+        tecnicoSelect.value = nombreUsuario;
+        tecnicoSelect.disabled = true; // 🔒 Bloqueado para que no lo cambien
     }
-    
-    // ✅ PASO 7: RUT limpio
+
+    // ❌ ELIMINAR CAMPO DESPACHO del formulario
+    const despachoSelect = document.getElementById('orden-despacho');
+    if (despachoSelect) {
+        despachoSelect.closest('.form-group')?.style.setProperty('display', 'none', 'important');
+    }
+
+    // RUT limpio
     const rutInput = document.getElementById('orden-rut');
     if (rutInput) {
         rutInput.classList.remove('valid', 'invalid');
+    }
+    
+    // ❌ LIMPIAR CAMPOS ELIMINADOS
+    ['coordenadas', 'ferreteria-lnb', 'ferreteria-antena'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = '';
+            el.closest('.form-group')?.style.setProperty('display', 'none', 'important');
+        }
+    });
+    // ✅ AUTO-ASIGNAR TÉCNICO (usuario logueado)
+    if (window.usuarioActivo) {
+        const tecnicoInput = document.getElementById('orden-tecnico');
+        if (tecnicoInput) {
+            tecnicoInput.value = window.usuarioActivo.nombre;
+            // Opcional: bloquear para que no lo cambien
+            // tecnicoInput.disabled = true;
+        }
     }
 }
 
 
 async function guardarOrden(event) {
     event.preventDefault();
+    
     const numero = document.getElementById('orden-numero')?.value.trim();
     const rutIngresado = document.getElementById('orden-rut')?.value.trim();
+    
     if (!rutIngresado) {
         return mostrarToast("El RUT es obligatorio.", "error");
     }
+    
     if (!validarRutChileno(rutIngresado)) {
         document.getElementById('orden-rut')?.classList.add('invalid');
         return mostrarToast("❌ RUT inválido. Verifique el formato y dígito verificador.", "error");
     }
+    
     const nombre = document.getElementById('orden-nombre')?.value.trim();
     const direccion = document.getElementById('orden-direccion')?.value.trim();
     const numero_contacto = document.getElementById('numero_contacto')?.value.trim();
-    const regionSelect = document.getElementById('orden-region');
+    
+    // ✅ NUEVOS CAMPOS: Persona que recibe y su teléfono
+    const nombreRecibe = document.getElementById('orden-nombre-recibe')?.value.trim() || '';
+    const telefonoRecibe = document.getElementById('orden-telefono-recibe')?.value.trim() || '';
+    
     const regionId = '13';
     const regionNombre = 'Región Metropolitana';
     const comuna = document.getElementById('orden-comuna')?.value;
     const servicio = document.getElementById('orden-servicio')?.value;
     const subServicio = document.getElementById('orden-sub')?.value;
     const fecha = document.getElementById('orden-fecha')?.value;
-    let tecnico = document.getElementById('orden-tecnico')?.value;
+    
+    // ✅ TÉCNICO AUTO-ASIGNADO (del usuario logueado)
+    let tecnico = '';
     if (window.usuarioActivo) {
-        const nombreUsuario = window.usuarioActivo.nombre;
-        // Si el usuario es técnico, forzar que sea él
-        if (esUsuarioTecnico(window.usuarioActivo)) {
-            tecnico = nombreUsuario;
-        }
+        tecnico = window.usuarioActivo.nombre;
     }
-    const despacho = document.getElementById('orden-despacho')?.value;
+    
+    // ❌ DESPACHO: Se deja null/vacío para que lo asigne quien valide
+    const despacho = null; // o '' 
+    
     const observacion = document.getElementById('orden-observacion')?.value.trim();
-
+    
+    // ✅ CAMPOS DE FERRETERÍA (sin LNB ni Antena)
+    const ferreteria = {
+        conectores: document.getElementById('ferreteria-conectores')?.value || '0',
+        cable: document.getElementById('ferreteria-cable')?.value || '0',
+        modem: document.getElementById('ferreteria-modem')?.value || '', // ✅ CAMBIADO de "tarjeta" a "modem"
+        // ❌ ELIMINADOS: lnb, antena
+    };
+    
     if (!numero || !rutIngresado || !nombre || !direccion || !regionId || !comuna || !servicio || !subServicio || !fecha) {
-        return mostrarToast("Todos los campos marcados son obligatorios (excepto Técnico).", "error");
+        return mostrarToast("Todos los campos marcados son obligatorios.", "error");
     }
 
     if (!validarRutChileno(rutIngresado)) {
@@ -1051,6 +1100,7 @@ async function guardarOrden(event) {
     }
 
     const puntaje = obtenerPuntajeSubservicio(subServicio);
+    
     const nuevaOrden = {
         numero,
         rut_cliente: rut,
@@ -1061,19 +1111,25 @@ async function guardarOrden(event) {
         servicio,
         subservicio: subServicio,
         fecha,
-        tecnico,
-        despacho,
+        tecnico, // ✅ Auto-asignado
+        despacho, // ❌ Null para asignar después
         observacion,
         estado: 'Agendada',
-        region: regionNombre
+        region: regionNombre,
+        // ✅ NUEVOS CAMPOS
+        nombre_recibe: nombreRecibe,
+        telefono_recibe: telefonoRecibe,
+        ferreteria: ferreteria,
+        // ❌ SIN coordenadas
     };
+    
     console.log("📦 Enviando a Supabase:", {
         ...nuevaOrden,
         numero_contacto: numero_contacto
     });
 
     try {
-        // Verificar si la orden ya existe antes de insertar
+        // Verificar si la orden ya existe
         const { data: existente } = await supabase
             .from('ordenes')
             .select('id, numero, estado')
@@ -1093,20 +1149,17 @@ async function guardarOrden(event) {
         if (error) throw error;
 
         const ordenGuardada = data[0];
-
-        // ✅ Añadir a la memoria local (incluye el `id` de Supabase)
         ordenes.unshift(ordenGuardada);
 
         mostrarToast(`Orden N° ${numero} guardada con éxito.`, "success");
         resetFormularioOrden();
         mostrarPanel('panel-agendadas');
+        
     } catch (err) {
         console.error("❌ Error al guardar en Supabase:", err);
-        // Mostrar el error real de Supabase en pantalla
         const mensajeError = err?.message || err?.details || JSON.stringify(err);
         mostrarToast(`Error al guardar: ${mensajeError}`, "error");
     }
-    
 }
 
 function esUsuarioTecnico(usuario) {
@@ -4197,8 +4250,7 @@ async function guardarArticulo(event) {
 function renderGestionEquipos() {
     const tbody = document.querySelector('#tabla-gestion-articulos tbody');
     if (!tbody) return;
-
-    // Combinar todos los artículos por tipo
+    
     const todosArticulos = [
         ...appData.articulos.seriados.map(a => ({ ...a, tipo: 'Equipo' })),
         ...appData.articulos.ferreteria.map(a => ({ ...a, tipo: 'Tarjeta' })),
@@ -4217,13 +4269,13 @@ function renderGestionEquipos() {
             <td>${art.codigo || '—'}</td>
             <td>
                 <button class="btn-editar-articulo" 
-                        data-id="${art.id}" 
+                        data-id="${art.codigo}" 
                         data-tipo="${art.tipo.toLowerCase()}"
                         style="background:orange; color:black; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.9em; margin-right:5px;">
                     ✏️ Editar
                 </button>
                 <button class="btn-eliminar-articulo" 
-                        data-id="${art.id}" 
+                        data-id="${art.codigo}" 
                         data-tipo="${art.tipo.toLowerCase()}"
                         style="background:#dc3545; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.9em;">
                     ❌ Eliminar
@@ -4231,93 +4283,155 @@ function renderGestionEquipos() {
             </td>
         </tr>
     `).join('');
+
+    // ✅ Asignar listeners después de renderizar
+    tbody.querySelectorAll('.btn-editar-articulo').forEach(btn => {
+        btn.onclick = () => {
+            const tipo = btn.dataset.tipo;
+            const codigo = btn.dataset.id;
+            const origenMap = { equipo: 'seriados', tarjeta: 'ferreteria', lnb: 'lnbs' };
+            const origen = origenMap[tipo];
+            const articulo = appData.articulos[origen]?.find(a => a.codigo === codigo);
+            if (!articulo) return;
+
+            const form = document.getElementById('form-crear-articulo');
+            form.style.display = 'block';
+            document.getElementById('articulo-nombre').value = articulo.nombre || '';
+            document.getElementById('articulo-codigo').value = articulo.codigo;
+            document.getElementById('articulo-codigo').disabled = true;
+            document.getElementById('tipo-articulo').value = tipo === 'equipo' ? 'seriado' : tipo === 'tarjeta' ? 'ferreteria' : 'lnb';
+            
+            // Campos nuevos (si existen en el HTML)
+            const elOp = document.getElementById('articulo-operador'); if(elOp) elOp.value = articulo.operador || 'Claro';
+            const elTec = document.getElementById('articulo-tecnologia'); if(elTec) elTec.value = articulo.tecnologia || 'GPON';
+
+            form.dataset.editando = codigo;
+            form.dataset.origen = origen;
+            form.querySelector('button[type="submit"]').textContent = '💾 Actualizar Artículo';
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+    });
+
+    tbody.querySelectorAll('.btn-eliminar-articulo').forEach(btn => {
+        btn.onclick = () => {
+            const tipo = btn.dataset.tipo;
+            const codigo = btn.dataset.id;
+            const origenMap = { equipo: 'seriados', tarjeta: 'ferreteria', lnb: 'lnbs' };
+            deshabilitarArticulo(codigo, origenMap[tipo]);
+        };
+    });
 }
 
-
-// Interceptamos el submit para detectar si es edición
 document.getElementById('form-crear-articulo')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     const editando = this.dataset.editando;
+    
+    // ✅ Capturar campos nuevos (operador y tecnología)
+    const operador = document.getElementById('articulo-operador')?.value || 'Claro';
+    const tecnologia = document.getElementById('articulo-tecnologia')?.value || 'Fibra'; // ✅ Default Fibra
+
     if (editando) {
-        // --- Modo Edición ---
+        // --- MODO EDICIÓN ---
         const origen = this.dataset.origen;
         const codigo = editando;
         const nuevoNombre = document.getElementById('articulo-nombre').value.trim();
+        
         if (!nuevoNombre) return mostrarToast("El nombre no puede estar vacío.", "error");
         
         const lista = appData.articulos[origen];
         const index = lista.findIndex(a => a.codigo === codigo);
+        
         if (index !== -1) {
+            // Actualizar en memoria con nuevos campos
             lista[index].nombre = nuevoNombre;
+            lista[index].operador = operador;
+            lista[index].tecnologia = tecnologia;
 
-            // ✅ Mapear origen a tipo de Supabase
+            // ✅ MAPEO CORREGIDO: Solo 2 tipos válidos
             const tipoMap = { 
                 'seriados': 'equipo', 
-                'ferreteria': 'tarjeta', 
-                'lnbs': 'lnb' 
+                'ferreteria': 'ferreteria'  // ✅ Cambiado: ya no es 'tarjeta'
+                // ❌ 'lnbs' eliminado completamente
             };
             const tipoSupabase = tipoMap[origen];
+            if (!tipoSupabase) return mostrarToast("Tipo de artículo no válido.", "error");
 
-            // ✅ Usar UPDATE, no INSERT
+            // ✅ UPDATE con nuevos campos
             const { error } = await supabase
                 .from('articulos')
-                .update({ nombre: nuevoNombre })
+                .update({ 
+                    nombre: nuevoNombre,
+                    operador: operador,
+                    tecnologia: tecnologia  // ✅ Nuevo campo
+                })
                 .eq('codigo', codigo)
                 .eq('tipo', tipoSupabase);
 
             if (error) {
                 console.error("Error al actualizar:", error);
-                mostrarToast("Error al guardar en la nube.", "error");
-                return;
+                return mostrarToast("Error al guardar en la nube.", "error");
             }
 
             mostrarToast("✅ Artículo actualizado con éxito.");
             this.style.display = 'none';
             delete this.dataset.editando;
             delete this.dataset.origen;
-            const submitBtn = this.querySelector('button[type="submit"]');
-            submitBtn.textContent = '💾 Guardar Artículo';
+            this.querySelector('button[type="submit"]').textContent = '💾 Guardar Artículo';
             this.querySelector('#articulo-codigo').disabled = false;
             this.reset();
             renderGestionEquipos();
         }
+        
     } else {
-        // --- Modo Creación ---
+        // --- MODO CREACIÓN ---
         const tipoForm = document.getElementById('tipo-articulo').value;
         const nombre = document.getElementById('articulo-nombre').value.trim();
         const codigo = document.getElementById('articulo-codigo').value.trim();
+        
         if (!nombre || !codigo) return mostrarToast("Nombre y código son obligatorios.", "error");
 
-        // ✅ Mapear tipo de formulario a tipo de Supabase
+        // ✅ MAPEO CORREGIDO: Solo 2 tipos válidos
         const tipoMap = { 
             'seriado': 'equipo', 
-            'ferreteria': 'tarjeta', 
-            'lnb': 'lnb' 
+            'ferreteria': 'ferreteria'  // ✅ Cambiado: ya no es 'tarjeta'
+            // ❌ 'lnb' eliminado completamente
         };
         const tipoSupabase = tipoMap[tipoForm];
         if (!tipoSupabase) return mostrarToast("Tipo de artículo no válido.", "error");
 
+        // ✅ Seleccionar array correcto (sin lnbs)
         let lista = appData.articulos[ 
-            tipoForm === 'seriado' ? 'seriados' : 
-            tipoForm === 'ferreteria' ? 'ferreteria' : 'lnbs'
+            tipoForm === 'seriado' ? 'seriados' : 'ferreteria'
         ];
 
         if (lista.some(a => a.codigo === codigo)) {
             return mostrarToast("El código ya existe. Debe ser único.", "error");
         }
 
-        // ✅ Guardar en memoria
-        lista.push({ nombre, codigo, activo: true });
+        // ✅ Guardar en memoria con nuevos campos
+        lista.push({ 
+            nombre, 
+            codigo, 
+            activo: true,
+            operador,      // ✅ Nuevo
+            tecnologia     // ✅ Nuevo
+        });
 
-        // ✅ Guardar en Supabase
+        // ✅ Guardar en Supabase con nuevos campos
         const { error } = await supabase
             .from('articulos')
-            .insert([{ codigo, nombre, tipo: tipoSupabase, activo: true }]);
+            .insert([{ 
+                codigo, 
+                nombre, 
+                tipo: tipoSupabase, 
+                activo: true,
+                operador,      // ✅ Nuevo campo en BD
+                tecnologia     // ✅ Nuevo campo en BD
+            }]);
 
         if (error) {
             console.error("Error al insertar:", error);
-            mostrarToast("Error al guardar en la nube.", "error");
-            return;
+            return mostrarToast("Error al guardar en la nube.", "error");
         }
 
         mostrarToast(`✅ Artículo ${tipoForm} guardado con éxito.`);
@@ -4328,39 +4442,128 @@ document.getElementById('form-crear-articulo')?.addEventListener('submit', async
 });
 
 async function deshabilitarArticulo(codigo, origen) {
-    if (!confirm(`¿Desea deshabilitar el artículo "${codigo}"? Dejará de aparecer en asignaciones.`)) return;
-
-    const articulo = appData.articulos[origen].find(a => a.codigo === codigo);
-    if (!articulo) return;
-
-    const tipoMap = {
-        'seriados': 'equipo',
-        'ferreteria': 'tarjeta',
-        'lnbs': 'lnb'
-    };
-    const tipo = tipoMap[origen];
-
-    if (!tipo) {
-        mostrarToast("⚠️ Tipo de artículo no reconocido.", "error");
-        return;
-    }
-
-    try {
-        const { error } = await supabase
-            .from('articulos')
-            .update({ activo: false })
-            .eq('codigo', codigo)
-            .eq('tipo', tipo);
-
-        if (error) throw error;
-
-        articulo.activo = false;
-        mostrarToast("✅ Artículo deshabilitado.");
-        renderGestionEquipos();
-    } catch (err) {
-        console.error("❌ Error al deshabilitar en Supabase:", err);
-        mostrarToast("Error al deshabilitar el artículo en la nube.", "error");
-    }
+    // Crear modal personalizado
+    const modal = document.createElement('div');
+    modal.id = 'modal-deshabilitar-articulo';
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); z-index: 9999;
+        display: flex; align-items: center; justify-content: center;
+        backdrop-filter: blur(3px);
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+        ">
+            <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
+            <h3 style="margin: 0 0 15px; color: #1e293b; font-size: 20px;">
+                ¿Deshabilitar artículo?
+            </h3>
+            <p style="color: #64748b; margin-bottom: 10px; font-size: 15px;">
+                Artículo: <strong style="color: #007bff;">"${codigo}"</strong>
+            </p>
+            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 25px;">
+                Dejará de aparecer en asignaciones pero se mantendrá en el historial.
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button id="btn-cancelar-deshabilitar" style="
+                    padding: 10px 24px;
+                    border: 2px solid #e2e8f0;
+                    background: white;
+                    color: #64748b;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    font-size: 14px;
+                    transition: all 0.2s;
+                ">Cancelar</button>
+                <button id="btn-confirmar-deshabilitar" style="
+                    padding: 10px 24px;
+                    border: none;
+                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                    color: white;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    font-size: 14px;
+                    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+                    transition: all 0.2s;
+                ">🚫 Deshabilitar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    return new Promise((resolve) => {
+        const btnCancelar = document.getElementById('btn-cancelar-deshabilitar');
+        const btnConfirmar = document.getElementById('btn-confirmar-deshabilitar');
+        
+        const cerrarModal = () => {
+            modal.style.animation = 'fadeOut 0.2s ease-out';
+            setTimeout(() => {
+                modal.remove();
+            }, 200);
+            resolve(false);
+        };
+        
+        btnCancelar.onclick = cerrarModal;
+        
+        btnConfirmar.onclick = async () => {
+            modal.remove();
+            
+            // Lógica de deshabilitación
+            const articulo = appData.articulos[origen].find(a => a.codigo === codigo);
+            if (!articulo) {
+                mostrarToast("❌ Artículo no encontrado.", "error");
+                resolve(false);
+                return;
+            }
+            
+            const tipoMap = {
+                'seriados': 'equipo',
+                'ferreteria': 'tarjeta',
+                'lnbs': 'lnb'
+            };
+            const tipo = tipoMap[origen];
+            
+            if (!tipo) {
+                mostrarToast("⚠️ Tipo de artículo no reconocido.", "error");
+                resolve(false);
+                return;
+            }
+            
+            try {
+                const { error } = await supabase
+                    .from('articulos')
+                    .update({ activo: false })
+                    .eq('codigo', codigo)
+                    .eq('tipo', tipo);
+                
+                if (error) throw error;
+                
+                articulo.activo = false;
+                mostrarToast("✅ Artículo deshabilitado correctamente.", "success");
+                renderGestionEquipos();
+                resolve(true);
+            } catch (err) {
+                console.error("❌ Error al deshabilitar:", err);
+                mostrarToast("Error al deshabilitar en la nube.", "error");
+                resolve(false);
+            }
+        };
+        
+        modal.onclick = (e) => {
+            if (e.target === modal) cerrarModal();
+        };
+    });
 }
 
 async function habilitarArticulo(codigo, origen) {
@@ -5126,7 +5329,7 @@ async function buscarSerieEnSupabase(terminoNorm) {
             const encontrado = items.some(item => {
                 if (tipo === 'equipo') {
                     return normalizarSerie(item.serie1) === terminoNorm ||
-                           normalizarSerie(item.serie2) === terminoNorm;
+                        normalizarSerie(item.serie2) === terminoNorm;
                 }
                 return normalizarSerie(item.serie) === terminoNorm;
             });
@@ -6428,44 +6631,51 @@ function cargarArticulosEnSelects() {
     }
 }
 
-
 /**
  * Renderiza el formulario de liquidación para una orden específica,
  * cargando las series disponibles del técnico asignado.
+ * SOLO equipos seriados: Decos, Modem, Extensores (sin LNB ni tarjetas).
  * @param {string} ordenId - El ID de la orden a liquidar.
  */
 function renderFormularioLiquidacion(ordenId) {
     const orden = ordenes.find(o => o.id === ordenId);
     if (!orden) return;
     
-    // === 1. EXTRAER NÚMERO DE DECOS DEL SUBSERVICIO ===
+    // === 1. EXTRAER CANTIDADES DEL SUBSERVICIO ===
     function extraerCantidadDecos(subservicio) {
         const match = subservicio.match(/(\d+)/);
         return match ? parseInt(match[1], 10) : 1;
     }
     
+    function extraerCantidadExtensores(subservicio) {
+        const match = subservicio.match(/(\d+)\s*ext/i) || subservicio.match(/extensor.*?(\d+)/i);
+        return match ? parseInt(match[1], 10) : 0;
+    }
+    
     const servicio = (orden.servicio || '').trim().toLowerCase();
     const subservicio = (orden.subservicio || '').trim().toLowerCase();
+    
     let numDecos = 0;
     let decosObligatorios = false;
-    let mostrarLNB = false;
+    let numExtensores = 0;
     
+    // Determinar cantidades según tipo de servicio
     if (servicio.includes('instalacion') || servicio.includes('instalación')) {
         numDecos = extraerCantidadDecos(subservicio) || 1;
         decosObligatorios = true;
-        mostrarLNB = true;
+        numExtensores = extraerCantidadExtensores(subservicio);
     } else if (servicio.includes('adicional')) {
         numDecos = extraerCantidadDecos(subservicio) || 1;
         decosObligatorios = true;
-        mostrarLNB = false;
+        numExtensores = extraerCantidadExtensores(subservicio);
     } else if (servicio.includes('vt') || servicio.includes('traslado') || servicio.includes('regularizacion')) {
         numDecos = 5;
         decosObligatorios = false;
-        mostrarLNB = true;
+        numExtensores = 0;
     } else {
         numDecos = 1;
         decosObligatorios = false;
-        mostrarLNB = false;
+        numExtensores = 0;
     }
     
     // === 2. BUSCAR TÉCNICO Y SU STOCK ===
@@ -6480,31 +6690,204 @@ function renderFormularioLiquidacion(ordenId) {
         return;
     }
     
-    // ✅ IMPORTANTE: Recargar stock desde asignaciones si está vacío
-    if (!tecnico.stock || (!tecnico.stock.equipos?.length && !tecnico.stock.tarjetas?.length && !tecnico.stock.lnbs?.length)) {
-        console.warn('⚠️ Stock vacío, recargando desde asignaciones...');
-        // Forzar recarga de datos
+    // Recargar stock si está vacío
+    if (!tecnico.stock?.equipos?.length) {
+        console.warn('⚠️ Stock vacío, recargando...');
         cargarDatos().then(() => {
             const tecActualizado = appData.empleados.find(emp => 
                 `${emp.nombre1} ${emp.apepaterno}`.trim() === tecnicoNombre
             );
             if (tecActualizado) {
-                renderFormularioLiquidacionConStock(ordenId, tecActualizado, numDecos, decosObligatorios, mostrarLNB);
+                renderFormularioLiquidacionConStock(ordenId, tecActualizado, numDecos, decosObligatorios, numExtensores);
             }
         });
         return;
     }
 
-    if (orden.series_salida_tarjetas?.length) {
-        const inputsTarjetaSalida = document.querySelectorAll('#contenedor-series .input-tarjeta-salida');
-        orden.series_salida_tarjetas.forEach((serie, idx) => {
-            if (inputsTarjetaSalida[idx] && serie) {
-                inputsTarjetaSalida[idx].value = serie;
-            }
-        });
-    }
+    renderFormularioLiquidacionConStock(ordenId, tecnico, numDecos, decosObligatorios, numExtensores);
+}
+
+/**
+ * Función auxiliar: renderiza el formulario con el stock garantizado
+ */
+function renderFormularioLiquidacionConStock(ordenId, tecnico, numDecos, decosObligatorios, numExtensores) {
+    const stockEquipos = tecnico.stock?.equipos || [];
     
-    renderFormularioLiquidacionConStock(ordenId, tecnico, numDecos, decosObligatorios, mostrarLNB);
+    // Obtener series disponibles para dropdowns
+    const opcionesEquipos = stockEquipos.map(eq => eq.serie1).filter(Boolean);
+    
+    // === HELPER: crear input con dropdown ===
+    function crearInputConDropdown({ id, clase, dataTipo, dataIndex, placeholder, opciones, requerido = false }) {
+        const uid = id || `input-${dataTipo}-${dataIndex}-${ordenId}`;
+        const opcionesHTML = opciones.map(op =>
+            `<div class="dropdown-option" data-value="${op}" style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0;" 
+                onmousedown="event.preventDefault(); seleccionarOpcionDropdown('${uid}', '${op}')">${op}</div>`
+        ).join('');
+
+        return `
+        <div style="position: relative;">
+            <div style="display: flex; gap: 4px;">
+                <input type="text" id="${uid}" class="${clase} form-control" 
+                    data-tipo="${dataTipo}" ${dataIndex !== undefined ? `data-index="${dataIndex}"` : ''}
+                    ${requerido ? 'required' : ''} placeholder="${placeholder}" autocomplete="off"
+                    style="width:100%; padding:6px 32px 6px 8px; margin-top:4px; border:1px solid #ced4da; border-radius:4px;">
+                <button type="button" onclick="toggleDropdown('${uid}')" 
+                    style="margin-top:4px; padding:0 8px; border:1px solid #ced4da; border-radius:4px; background:#f8f9fa; cursor:pointer; font-size:12px;">▼</button>
+            </div>
+            <div id="dropdown-${uid}" style="display:none; position:absolute; top:100%; left:0; right:0; background:white; 
+                border:1px solid #ced4da; border-radius:4px; max-height:180px; overflow-y:auto; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+                ${opcionesHTML.length ? opcionesHTML : '<div style="padding:8px 12px; color:#999; font-size:13px;">Sin stock disponible</div>'}
+            </div>
+        </div>`;
+    }
+
+    let html = '';
+
+    // --- Decos/Modem (todos como "equipo") ---
+    for (let i = 1; i <= numDecos; i++) {
+        const asterisco = decosObligatorios ? ' <span style="color:red">*</span>' : '(Opcional)';
+        html += `
+        <div data-deco-index="${i - 1}" style="background:#f8f9fa; padding:10px; border-radius:6px; margin-bottom:12px; ${decosObligatorios ? 'border-left:4px solid #28a745;' : ''}">
+            <label>Equipo ${i}${asterisco}: </label>
+            ${crearInputConDropdown({
+                clase: 'input-serie-manual',
+                dataTipo: 'equipo',
+                dataIndex: i - 1,
+                placeholder: 'Ingrese o seleccione serie',
+                opciones: opcionesEquipos,
+                requerido: decosObligatorios
+            })}
+        </div>`;
+    }
+
+    // --- Extensores (si aplican) ---
+    if (numExtensores > 0) {
+        html += `<h4 style="margin:20px 0 10px; color:#6c757d; border-bottom:2px solid #eee;">Extensores</h4>`;
+        for (let i = 1; i <= numExtensores; i++) {
+            html += `
+            <div style="background:#f8f9fa; padding:10px; border-radius:6px; margin-bottom:12px;">
+                <label>Extensor ${i} (Opcional): </label>
+                ${crearInputConDropdown({
+                    clase: 'input-serie-manual',
+                    dataTipo: 'extensor',
+                    dataIndex: i - 1,
+                    placeholder: 'Ingrese o seleccione serie',
+                    opciones: opcionesEquipos,
+                    requerido: false
+                })}
+            </div>`;
+        }
+    }
+
+    // --- Equipos Retirados (si es servicio con retiro) ---
+    const esServicioConRetiro = servicio.includes('vt') || servicio.includes('traslado') || servicio.includes('regularizar');
+    
+    if (esServicioConRetiro) {
+        html += `
+        <h4 style="margin:20px 0 15px; color:#dc3545; border-bottom:2px solid #eee; padding-bottom:10px;">Equipos Retirados (Opcional)</h4>
+        <div style="display:flex; flex-direction:column; gap:10px;">`;
+        
+        for (let i = 1; i <= 5; i++) {
+            html += `
+            <div style="display:flex; align-items:center; gap:8px; padding:8px; background:#fff; border:1px solid #ced4da; border-radius:6px;">
+                <label style="font-weight:500; color:#333; min-width:100px; text-align:right;">Equipo ${i}: </label>
+                <input type="text" class="input-serie-salida" data-salida-index="${i - 1}"
+                    placeholder="Serie Equipo ${i}"
+                    style="flex:1; padding:8px; border:none; outline:none; background:transparent;">
+            </div>`;
+        }
+        html += `</div>`;
+    }
+
+    document.getElementById('contenedor-series').innerHTML = html;
+
+    // === VALIDACIÓN EN TIEMPO REAL ===
+    const valoresActuales = new Set();
+
+    document.querySelectorAll('#contenedor-series .input-serie-manual').forEach(input => {
+        input.addEventListener('blur', function() {
+            const serie = this.value.trim();
+            const prev = this.dataset.prevValue || '';
+            
+            if (!serie) {
+                if (prev) valoresActuales.delete(prev);
+                delete this.dataset.prevValue;
+                verificarBotonLiquidacion();
+                return;
+            }
+            
+            // Validar que exista en sistema
+            if (!serieExisteEnIngresos(serie)) {
+                mostrarToastFront(`La serie "${serie}" no existe en el sistema.`, 'error');
+                this.value = '';
+                if (prev) valoresActuales.delete(prev);
+                this.focus();
+                verificarBotonLiquidacion();
+                return;
+            }
+            
+            // Validar duplicados
+            const otros = Array.from(valoresActuales).filter(v => v !== prev);
+            if (otros.includes(serie)) {
+                mostrarToastFront(`La serie "${serie}" ya está seleccionada.`, 'error');
+                this.value = '';
+                if (prev) valoresActuales.delete(prev);
+                this.focus();
+                verificarBotonLiquidacion();
+                return;
+            }
+            
+            if (prev) valoresActuales.delete(prev);
+            valoresActuales.add(serie);
+            this.dataset.prevValue = serie;
+            verificarBotonLiquidacion();
+        });
+        
+        input.addEventListener('focus', function() {
+            this.dataset.prevValue = this.value.trim();
+        });
+        
+        input.addEventListener('input', function() {
+            const inputId = this.id || `input-equipo-${this.dataset.index}-${ordenId}`;
+            filtrarDropdown(inputId, this.value);
+            verificarBotonLiquidacion();
+        });
+    });
+
+    // === PRE-LLENAR SERIES EXISTENTES ===
+    setTimeout(() => {
+        if (orden.series_entrada?.length) {
+            orden.series_entrada.forEach((serie, idx) => {
+                const input = document.querySelector(
+                    `#contenedor-series .input-serie-manual[data-tipo="equipo"][data-index="${idx}"]`
+                );
+                if (input && serie) {
+                    input.value = serie;
+                    input.dataset.prevValue = serie;
+                    valoresActuales.add(serie);
+                }
+            });
+        }
+        if (orden.series_extensores?.length) {
+            orden.series_extensores.forEach((serie, idx) => {
+                const input = document.querySelector(
+                    `#contenedor-series .input-serie-manual[data-tipo="extensor"][data-index="${idx}"]`
+                );
+                if (input && serie) {
+                    input.value = serie;
+                    input.dataset.prevValue = serie;
+                    valoresActuales.add(serie);
+                }
+            });
+        }
+        if (orden.series_salida?.length) {
+            const inputsSalida = document.querySelectorAll('#contenedor-series .input-serie-salida');
+            orden.series_salida.forEach((serie, idx) => {
+                if (inputsSalida[idx] && serie) inputsSalida[idx].value = serie;
+            });
+        }
+        verificarBotonLiquidacion();
+    }, 100);
 }
 
 // Función separada para renderizar con stock garantizado
@@ -6515,6 +6898,11 @@ function renderFormularioLiquidacionConStock(ordenId, tecnico, numDecos, decosOb
     const servicio = (orden.servicio || '').trim().toLowerCase();
     const stock = tecnico.stock || { equipos: [], tarjetas: [], lnbs: [] };
 
+    // === DEBUG: Verificar stock antes de renderizar ===
+    console.log('🔍 Stock del técnico:', tecnico.stock);
+    console.log('📦 Equipos disponibles:', stock.equipos?.length || 0);
+    console.log('🃏 Tarjetas disponibles:', stock.tarjetas?.length || 0);
+    console.log('📡 LNBs disponibles:', stock.lnbs?.length || 0);
     // === HELPER: crear input con dropdown custom ===
     function crearInputConDropdown({ id, clase, dataTipo, dataIndex, placeholder, opciones, requerido = false }) {
         const uid = id || `input-${dataTipo}-${dataIndex}-${ordenId}`;
@@ -6612,6 +7000,39 @@ function renderFormularioLiquidacionConStock(ordenId, tecnico, numDecos, decosOb
                 opciones: opcionesLNB
             })}
         </div>`;
+    }
+    // === EXTENSORES (nuevo) ===
+    const numExtensores = extraerCantidadExtensores(subservicio);
+    if (numExtensores > 0) {
+        const opcionesExtensores = (stock.equipos || [])
+            .filter(eq => {
+                // ✅ Opcional: filtrar solo equipos que sean extensores según su código/nombre
+                const articulo = appData.articulos.seriados.find(a => a.codigo === eq.articuloCodigo);
+                return articulo?.nombre?.toLowerCase().includes('extensor') || 
+                    articulo?.codigo?.toLowerCase().includes('ext');
+            })
+            .map(eq => eq.serie1)
+            .filter(Boolean);
+
+        html += `
+        <h4 style="margin: 20px 0 10px; color: #6c757d; border-bottom: 2px solid #eee;">
+            📡 Extensores (${numExtensores}) ${decosObligatorios ? '*' : '(Opcional)'}
+        </h4>`;
+        
+        for (let i = 1; i <= numExtensores; i++) {
+            html += `
+            <div data-ext-index="${i - 1}" style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 12px;">
+                <label>Extensor ${i}${decosObligatorios ? ' *' : ''}: </label>
+                ${crearInputConDropdown({
+                    clase: 'input-serie-manual',
+                    dataTipo: 'extensor',  // ✅ Nuevo tipo
+                    dataIndex: i - 1,
+                    placeholder: 'Ingrese o seleccione serie de extensor',
+                    opciones: opcionesExtensores,
+                    requerido: decosObligatorios
+                })}
+            </div>`;
+        }
     }
 
     // --- Equipos y Tarjetas Retirados ---
@@ -6756,15 +7177,13 @@ function renderFormularioLiquidacionConStock(ordenId, tecnico, numDecos, decosOb
     }, 100);
 }
 
-// === HELPERS DROPDOWN CUSTOM ===
+// === HELPERS DROPDOWN (consérvalos) ===
 function toggleDropdown(inputId) {
-    // Cerrar todos los dropdowns abiertos primero
     document.querySelectorAll('[id^="dropdown-"]').forEach(d => {
         if (d.id !== `dropdown-${inputId}`) d.style.display = 'none';
     });
     const dd = document.getElementById(`dropdown-${inputId}`);
-    if (!dd) return;
-    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+    if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
 }
 
 function seleccionarOpcionDropdown(inputId, valor) {
@@ -6782,6 +7201,7 @@ function filtrarDropdown(inputId, texto) {
     const opciones = dd.querySelectorAll('.dropdown-option');
     const filtro = texto.toLowerCase();
     let hayOpciones = false;
+    
     opciones.forEach(op => {
         const coincide = op.dataset.value.toLowerCase().includes(filtro);
         op.style.display = coincide ? 'block' : 'none';
@@ -6799,61 +7219,28 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Mostrar mensaje al frente (no detrás del modal)
+// Toast frontal (para validaciones)
 function mostrarToastFront(mensaje, tipo = "info") {
     const toast = document.createElement("div");
     toast.className = `toast toast-${tipo}`;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: ${tipo === "error" ? "#dc3545" : tipo === "success" ? "#28a745" : "#17a2b8"};
-        color: white;
-        padding: 12px 20px;
-        border-radius: 6px;
-        z-index: 9999;
-        font-weight: bold;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    `;
+    toast.style.cssText = `position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
+        background: ${tipo === "error" ? "#dc3545" : tipo === "success" ? "#28a745" : "#17a2b8"}; 
+        color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; font-weight: bold; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);`;
     toast.textContent = mensaje;
     document.body.appendChild(toast);
-    setTimeout(() => {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-    }, 3000);
-    }
+    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 3000);
+}
 
-    //Función validarSerieExiste
-function validarSerieExiste(serie, ordenId) {
+// Validar si serie existe en sistema
+function serieExisteEnIngresos(serie) {
     if (!serie) return false;
-
-    // Buscar en stock del técnico de esta orden
-    if (ordenId) {
-        const ordenLocal = ordenes.find(o => o.id === ordenId);
-        const tecnicoOrden = appData.empleados.find(
-            emp => `${emp.nombre1} ${emp.apepaterno}`.trim() === ordenLocal?.tecnico?.trim()
-        );
-        if (tecnicoOrden?.stock) {
-            if (tecnicoOrden.stock.equipos?.some(e => e.serie1 === serie || e.serie2 === serie)) return true;
-            if (tecnicoOrden.stock.tarjetas?.some(t => t.serie === serie)) return true;
-            if (tecnicoOrden.stock.lnbs?.some(l => l.serie === serie)) return true;
-        }
-    }
-
-    // Buscar en ingresos generales
+    const norm = normalizarSerie(serie);
+    
+    // Buscar en equipos
     for (const ing of appData.ingresosSeriados || []) {
         for (const eq of ing.equipos || []) {
-            if (eq.serie1 === serie || eq.serie2 === serie) return true;
-        }
-    }
-    for (const ing of appData.ingresosTarjetas || []) {
-        for (const t of ing.tarjetas || []) {
-            if (t.serie === serie) return true;
-        }
-    }
-    for (const ing of appData.ingresosLNB || []) {
-        for (const l of ing.lnbs || []) {
-            if (l.serie === serie) return true;
+            if (normalizarSerie(eq.serie1) === norm || normalizarSerie(eq.serie2) === norm) return true;
         }
     }
     return false;
@@ -6861,7 +7248,7 @@ function validarSerieExiste(serie, ordenId) {
 
 /**
  * Guarda la liquidación de una orden en Supabase y rebaja el stock del técnico.
- * Combina equipos y tarjetas retirados en un solo campo: series_salida.
+ * SOLO equipos seriados: Decos, Modem, Extensores (sin LNB ni tarjetas).
  * @param {string} ordenId - El ID de la orden a liquidar.
  */
 async function guardarLiquidacion(ordenId) {
@@ -6885,9 +7272,7 @@ async function guardarLiquidacion(ordenId) {
     // === 2. CAPTURAR FERRETERÍA ===
     const ferreteria = {
         conectores: document.getElementById('ferreteria-conectores')?.value || '0',
-        lnb: document.getElementById('ferreteria-lnb')?.value || '',
-        cable: document.getElementById('ferreteria-cable')?.value || '0',
-        antena: document.getElementById('ferreteria-antena')?.value || ''
+        cable: document.getElementById('ferreteria-cable')?.value || '0'
     };
 
     // === 3. BUSCAR TÉCNICO ===
@@ -6901,113 +7286,62 @@ async function guardarLiquidacion(ordenId) {
         return;
     }
 
-    // === 4. CAPTURAR SERIES INSTALADAS ===
+    // === 4. CAPTURAR SERIES INSTALADAS (Decos + Modem + Extensores) ===
     const seriesEntrada = [];
 
-    // ✅ FIX: tarjetas indexadas — array paralelo a seriesEntrada
-    // null en posición i = deco i no tiene tarjeta
-    const seriesTarjetasIndexadas = [];
-    const seriesTarjetasPlanas = []; // para Supabase (sin nulls)
-    const seriesLNB = [];
-
-    // --- Decos por data-index ---
+    // --- Capturar equipos seriados por data-index (Decos/Modem) ---
     const inputsEquipo = document.querySelectorAll(
         '#contenedor-series .input-serie-manual[data-tipo="equipo"]'
     );
+    
     inputsEquipo.forEach((input, idx) => {
         const valor = input.value.trim();
         if (!valor) {
-            seriesEntrada.push(null); // mantener posición
+            seriesEntrada.push(null); // mantener posición para indexación
             return;
         }
+        // Extraer serie limpia (quitar prefijo si existe: "DECO-ABC123" → "ABC123")
         const partes = valor.split('-');
         const serie = partes.length > 1 ? partes[partes.length - 1].trim() : valor;
+        
+        // Validar que exista en stock del técnico
         const eq = tecnico.stock?.equipos?.find(e => e.serie1 === serie || e.serie2 === serie);
         seriesEntrada.push(eq ? eq.serie1 : null);
     });
 
-    const puntajeLiquidado = await obtenerPuntajeSubservicio(orden.servicio, orden.subservicio);
-    const { error: errUpdate } = await supabase  // ← CAMBIÉ errOrd por errUpdate
-    .from('ordenes')
-    .update({
-        estado: 'Liquidadas',
-        puntaje_liquidado: puntajeLiquidado,
-    });
-
-    // Limpiar nulls del final (decos vacíos al final no cuentan)
+    // Limpiar nulls del final (campos vacíos al final no cuentan)
     while (seriesEntrada.length > 0 && seriesEntrada[seriesEntrada.length - 1] === null) {
         seriesEntrada.pop();
     }
 
-    // --- Tarjetas por data-index (emparejadas con su deco) ---
-    for (let idx = 0; idx < seriesEntrada.length; idx++) {
-        const input = document.querySelector(
-            `#contenedor-series .input-serie-manual[data-tipo="tarjeta"][data-index="${idx}"]`
-        );
-        const valor = input?.value?.trim() || '';
-        if (!valor) {
-            seriesTarjetasIndexadas.push(null); // sin tarjeta en esta posición
-            continue;
-        }
-        const partes = valor.split('-');
-        const serie = partes.length > 1 ? partes[partes.length - 1].trim() : valor;
-        const t = tecnico.stock?.tarjetas?.find(t => t.serie === serie);
-        if (t) {
-            seriesTarjetasIndexadas.push(t.serie);
-            seriesTarjetasPlanas.push(t.serie);
-        } else {
-            seriesTarjetasIndexadas.push(null);
-        }
-    }
-
-    // --- LNB ---
-    // --- LNB ---
-    const inputLNB = document.getElementById('input-lnb-liquidacion');
-    if (inputLNB?.value?.trim()) {
-        const valor = inputLNB.value.trim();
+    // === CAPTURAR EXTENSORES INSTALADOS ===
+    const seriesExtensores = [];
+    const inputsExtensores = document.querySelectorAll(
+        '#contenedor-series .input-serie-manual[data-tipo="extensor"]'
+    );
+    
+    inputsExtensores.forEach((input) => {
+        const valor = input.value.trim();
+        if (!valor) return;
+        
         const partes = valor.split('-');
         const serie = partes.length > 1 ? partes[partes.length - 1].trim() : valor;
         
-        // ✅ FIX: buscar en stock del técnico primero, luego en ingresos generales
-        const enStockTecnico = tecnico.stock?.lnbs?.find(l => l.serie === serie);
-        if (enStockTecnico) {
-            seriesLNB.push(enStockTecnico.serie);
-        } else {
-            // Buscar en ingresos generales (LNB asignado directo sin pasar por stock)
-            let encontrado = false;
-            for (const ing of appData.ingresosLNB || []) {
-                for (const l of ing.lnbs || []) {
-                    if (l.serie === serie) {
-                        seriesLNB.push(serie);
-                        encontrado = true;
-                        break;
-                    }
-                }
-                if (encontrado) break;
-            }
-            if (!encontrado) {
-                mostrarToast(`⚠️ LNB serie "${serie}" no encontrado en sistema.`, 'error');
-                return;
-            }
-        }
-    }
+        // Validar que exista en stock
+        const eq = tecnico.stock?.equipos?.find(e => e.serie1 === serie);
+        if (eq) seriesExtensores.push(eq.serie1);
+    });
 
-    // === 5. CAPTURAR SERIES RETIRADAS (separadas por tipo) ===
-    // ✅ FIX: guardamos decos y tarjetas de retiro en campos separados
-    const seriesSalidaDecos = [];
-    const seriesSalidaTarjetas = [];
-
+    // === 5. CAPTURAR SERIES RETIRADAS (equipos del cliente) ===
+    const seriesSalida = [];
     document.querySelectorAll('#contenedor-series .input-serie-salida').forEach(input => {
         const v = input.value.trim();
-        if (v) seriesSalidaDecos.push(v);
-    });
-    document.querySelectorAll('#contenedor-series .input-tarjeta-salida').forEach(input => {
-        const v = input.value.trim();
-        if (v) seriesSalidaTarjetas.push(v);
+        if (v) seriesSalida.push(v);
     });
 
-    // series_entrada sin nulls para guardar en Supabase
+    // Preparar arrays finales (sin nulls) para Supabase
     const seriesEntradaLimpias = seriesEntrada.filter(Boolean);
+    const seriesExtensoresLimpias = seriesExtensores.filter(Boolean);
 
     // === 6. ACTUALIZAR ORDEN EN SUPABASE ===
     const { error: errOrd } = await supabase
@@ -7019,73 +7353,52 @@ async function guardarLiquidacion(ordenId) {
             coordenadas: coordenadas,
             observacion: observaciones,
             series_entrada: seriesEntradaLimpias.length ? seriesEntradaLimpias : null,
-            // ✅ FIX: guardamos array indexado (con nulls) para re-liquidar correctamente
-            series_tarjetas: seriesTarjetasIndexadas.length ? seriesTarjetasIndexadas : null,
-            series_lnb: seriesLNB.length ? seriesLNB : null,
-            // ✅ FIX: decos y tarjetas de retiro separados
-            series_salida: seriesSalidaDecos.length ? seriesSalidaDecos : null,
-            series_salida_tarjetas: seriesSalidaTarjetas.length ? seriesSalidaTarjetas : null,
+            series_extensores: seriesExtensoresLimpias.length ? seriesExtensoresLimpias : null,
+            series_salida: seriesSalida.length ? seriesSalida : null,
             ferreteria: ferreteria,
             puntaje_liquidado: orden.puntaje || 0
         })
         .eq('id', ordenId);
 
-    if (errUpdate) {  // ← CAMBIÉ aquí también
-        console.error("Error al liquidar:", errUpdate);
+    if (errOrd) {
+        console.error("Error al liquidar:", errOrd);
         mostrarToast("❌ Error al guardar orden.", "error");
         return;
     }
 
     // === 7. ELIMINAR SERIES DEL STOCK DEL TÉCNICO ===
-    const eliminarDelStock = async (tipo, seriesArr) => {
+    const eliminarDelStock = async (seriesArr) => {
         if (!seriesArr.length) return;
-        const { data: asignaciones, error } = await supabase
+        
+        const { data: asignaciones } = await supabase
             .from('asignaciones')
             .select('*')
             .eq('tecnico_id', tecnico.id)
-            .eq('tipo', tipo);
+            .eq('tipo', 'equipo');
 
-        if (error || !asignaciones?.length) return;
+        if (!asignaciones?.length) return;
 
-        for (const asignacion of asignaciones) {
-            let nuevasSeries;
-            if (tipo === 'equipo') {
-                nuevasSeries = asignacion.series.filter(s => {
-                    const s1 = (typeof s === 'object' && s !== null) ? s.serie1 : s;
-                    return !seriesArr.includes(s1);
-                });
-            } else {
-                nuevasSeries = asignacion.series.filter(s => {
-                    const sv = (typeof s === 'object' && s !== null) ? s.serie : s;
-                    return !seriesArr.includes(sv);
-                });
-            }
+        for (const asig of asignaciones) {
+            const nuevasSeries = asig.series.filter(s => {
+                const s1 = (typeof s === 'object' && s !== null) ? s.serie1 : s;
+                return !seriesArr.includes(s1);
+            });
+            
             if (nuevasSeries.length === 0) {
-                await supabase.from('asignaciones').delete().eq('id', asignacion.id);
+                await supabase.from('asignaciones').delete().eq('id', asig.id);
             } else {
-                await supabase.from('asignaciones').update({ series: nuevasSeries }).eq('id', asignacion.id);
+                await supabase.from('asignaciones').update({ series: nuevasSeries }).eq('id', asig.id);
             }
         }
     };
 
-    await eliminarDelStock('equipo', seriesEntradaLimpias);
-    await eliminarDelStock('tarjeta', seriesTarjetasPlanas);
-    await eliminarDelStock('lnb', seriesLNB);
+    // Eliminar equipos instalados y extensores del stock
+    await eliminarDelStock([...seriesEntradaLimpias, ...seriesExtensoresLimpias]);
 
     // === 8. ACTUALIZAR MEMORIA LOCAL ===
-    if (tecnico.stock) {
-        if (Array.isArray(tecnico.stock.equipos)) {
-            const set = new Set(seriesEntradaLimpias);
-            tecnico.stock.equipos = tecnico.stock.equipos.filter(eq => !set.has(eq.serie1));
-        }
-        if (Array.isArray(tecnico.stock.tarjetas)) {
-            const set = new Set(seriesTarjetasPlanas);
-            tecnico.stock.tarjetas = tecnico.stock.tarjetas.filter(t => !set.has(t.serie));
-        }
-        if (Array.isArray(tecnico.stock.lnbs)) {
-            const set = new Set(seriesLNB);
-            tecnico.stock.lnbs = tecnico.stock.lnbs.filter(l => !set.has(l.serie));
-        }
+    if (tecnico.stock?.equipos) {
+        const seriesUsadas = new Set([...seriesEntradaLimpias, ...seriesExtensoresLimpias]);
+        tecnico.stock.equipos = tecnico.stock.equipos.filter(eq => !seriesUsadas.has(eq.serie1));
     }
 
     // === 9. ACTUALIZAR ORDEN EN MEMORIA LOCAL ===
@@ -7097,16 +7410,13 @@ async function guardarLiquidacion(ordenId) {
         ordenLocal.coordenadas = coordenadas;
         ordenLocal.observacion_liquidacion = observaciones;
         ordenLocal.series_entrada = seriesEntradaLimpias;
-        ordenLocal.series_tarjetas = seriesTarjetasIndexadas; // ✅ indexado
-        ordenLocal.series_lnb = seriesLNB;
-        ordenLocal.series_salida = seriesSalidaDecos;              // ✅ solo decos
-        ordenLocal.series_salida_tarjetas = seriesSalidaTarjetas;  // ✅ solo tarjetas
+        ordenLocal.series_extensores = seriesExtensoresLimpias;
+        ordenLocal.series_salida = seriesSalida;
         ordenLocal.ferreteria = ferreteria;
     }
 
     // === 10. CERRAR Y REFRESCAR ===
     document.getElementById('modal-liquidacion').style.display = 'none';
-    
     mostrarToast("✅ Orden liquidada exitosamente.", "success");
 
     if (document.getElementById('panel-agendadas')?.classList.contains('active')) {
@@ -7197,13 +7507,22 @@ function abrirModalLiquidacion(ordenId) {
     if (orden.ferreteria && typeof orden.ferreteria === 'object') {
         const f = orden.ferreteria;
         const fc = document.getElementById('ferreteria-conectores');
-        const fl = document.getElementById('ferreteria-lnb');
         const fca = document.getElementById('ferreteria-cable');
-        const fa = document.getElementById('ferreteria-antena');
-        if (fc && f.conectores) fc.value = f.conectores;
-        if (fl && f.lnb) fl.value = f.lnb;
-        if (fca && f.cable) fca.value = f.cable;
-        if (fa && f.antena) fa.value = f.antena;
+        if (fc && f.conectores) fc.value = f.conectores;        
+        if (fca && f.cable) fca.value = f.cable;        
+    }
+
+    // === FECHA AUTOMÁTICA ===
+    const fechaHoy = new Date().toISOString().split('T')[0];
+    // Si existe el campo, lo ocultamos y seteamos el valor
+    const fechaInput = document.getElementById('liquidacion-fecha');
+    if (fechaInput) {
+        fechaInput.value = fechaHoy;
+        fechaInput.style.display = 'none'; // ✅ Ocultar visualmente
+        // Opcional: agregar campo oculto si necesitas enviarlo
+        if (!fechaInput.hasAttribute('type')) {
+            fechaInput.type = 'hidden';
+        }
     }
 
     // === 4. RENDERIZAR FORMULARIO DE SERIES ===
@@ -7878,6 +8197,71 @@ function validarRutInput(inputElement) {
     }
 }
 
+// ================= FLORA =================
+async function renderFlota(vista) {
+    const tbody = document.getElementById(vista === 'km' ? 'tabla-flota-km' : vista === 'prox' ? 'tabla-flota-prox' : 'tabla-flota-actual');
+    if(!tbody) return;
+    
+    // Simula carga desde Supabase o appData
+    const datos = appData.flota || []; 
+    tbody.innerHTML = '';
+    
+    if(datos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px; text-align:center; color:#666;">No hay registros</td></tr>';
+        return;
+    }
+
+    datos.forEach(v => {
+        if(vista === 'km') {
+            tbody.innerHTML += `<tr><td style="padding:10px;">${v.patente}</td><td>${v.marca} ${v.modelo}</td><td>${v.km_actual}</td><td><span style="padding:4px 8px; border-radius:12px; font-size:12px; background:${v.estado==='Activo'?'#d1fae5':'#fee2e2'}">${v.estado}</span></td><td><button onclick="editarFlota('${v.id}')" style="color:#007bff; background:none; border:none; cursor:pointer;">✏️</button></td></tr>`;
+        } else if(vista === 'prox') {
+            const kmRestante = v.km_prox_revision - v.km_actual;
+            tbody.innerHTML += `<tr><td style="padding:10px;">${v.patente}</td><td>${v.marca} ${v.modelo}</td><td>${v.km_actual}</td><td>${v.km_prox_revision}</td><td>${kmRestante < 500 ? '⚠️ Urgente' : '✅ OK'}</td></tr>`;
+        } else {
+            tbody.innerHTML += `<tr><td style="padding:10px;">${v.patente}</td><td>${v.marca} ${v.modelo}</td><td style="font-weight:bold;">${v.km_actual} km</td><td>${v.ultima_actualizacion || '—'}</td></tr>`;
+        }
+    });
+}
+
+async function guardarFlota(datos) {
+    // Aquí va tu insert a Supabase
+    const { error } = await supabase.from('flota').insert([datos]);
+    if(error) return mostrarToast('❌ Error al guardar', 'error');
+    
+    appData.flota.push(datos);
+    renderFlota('km');
+    renderFlota('prox');
+    renderFlota('actual');
+    mostrarToast('✅ Vehículo registrado', 'success');
+    cerrarModales();
+}
+
+// ================= PAÑOL =================
+async function renderPañol(categoria) {
+    const tbody = document.getElementById(`tabla-panol-${categoria}`);
+    if(!tbody) return;
+    const datos = appData.panol[categoria] || [];
+    tbody.innerHTML = '';
+    if(datos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px; text-align:center; color:#666;">Sin stock</td></tr>';
+        return;
+    }
+    datos.forEach(p => {
+        tbody.innerHTML += `<tr><td style="padding:10px;">${p.nombre}</td><td>${p.codigo || p.talla}</td><td>${p.stock}</td><td>${p.ubicacion || p.vencimiento || p.entregados}</td><td><span style="padding:4px 8px; border-radius:12px; font-size:12px; background:${p.stock>0?'#d1fae5':'#fee2e2'}">${p.stock>0?'Disponible':'Agotado'}</span></td></tr>`;
+    });
+}
+
+async function guardarPañol(categoria, datos) {
+    const tabla = `panol_${categoria}`; // ej: panol_herramientas
+    const { error } = await supabase.from(tabla).insert([datos]);
+    if(error) return mostrarToast('❌ Error al guardar', 'error');
+    
+    appData.panol[categoria].push(datos);
+    renderPañol(categoria);
+    mostrarToast('✅ Item agregado al Pañol', 'success');
+    cerrarModales();
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // =======================================================
@@ -8108,12 +8492,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // =======================================================
         safeAddListener('btn-crear-seriado', 'click', () => mostrarFormularioCreacion('seriado'));
         safeAddListener('btn-crear-ferreteria', 'click', () => mostrarFormularioCreacion('ferreteria'));
-        safeAddListener('btn-cancelar-crear', 'click', cancelarCreacion);
-        
-        safeAddListener('btn-crear-LNB', 'click', () => {
-            document.getElementById('form-crear-lnb').style.display = 'block';
-        });
-        
+        safeAddListener('btn-cancelar-crear', 'click', cancelarCreacion);        
         safeAddListener('btn-cancelar-crear-lnb', 'click', () => {
             document.getElementById('form-crear-lnb').style.display = 'none';
         });
@@ -8406,108 +8785,161 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (menuToggle) menuToggle.innerHTML = '☰';
         }
     });
+    // Navegación Flota/Pañol
+    document.querySelectorAll('[data-panel^="panel-flota-"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const view = btn.dataset.panel.replace('panel-flota-', '');
+            mostrarPanel(btn.dataset.panel);
+            renderFlota(view === 'km' ? 'km' : view === 'prox-revision' ? 'prox' : 'actual');
+        });
+    });
+
+    document.querySelectorAll('[data-panel^="panel-panol-"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const cat = btn.dataset.panel.replace('panel-panol-', '');
+            mostrarPanel(btn.dataset.panel);
+            renderPañol(cat);
+        });
+    });
+
+    // Modales simples (puedes reutilizar tu modal genérico o crear uno rápido)
+    function abrirModalFlota() {
+        // Implementa tu modal aquí o usa prompt para prueba rápida
+        const patente = prompt("Patente:");
+        if(!patente) return;
+        guardarFlota({ patente, marca: 'Toyota', modelo: 'Hilux', km_actual: 45000, km_prox_revision: 50000, estado: 'Activo', ultima_actualizacion: new Date().toLocaleDateString() });
+    }
+
+    function abrirModalPañol(cat) {
+        const nombre = prompt("Nombre del item:");
+        if(!nombre) return;
+        guardarPañol(cat, { nombre, codigo: 'GEN-001', stock: 10, ubicacion: 'Estante A', estado: 'Disponible' });
+    }
+
+    function cerrarModales() {
+        // Cierra tu modal existente
+        document.querySelectorAll('.modal, .backdrop').forEach(el => el.style.display = 'none');
+    }
 
 });
+
+// =======================================================
+// === GENERAR DECOS Y EXTENSORES AL CAMBIAR SUBSERVICIO ===
+// =======================================================
+document.getElementById('orden-sub')?.addEventListener('change', function() {
+    const subservicio = this.value;
+    if (!subservicio) return;
+
+    // 1. Extraer cantidades
+    const matchDeco = subservicio.match(/(\d+)\s*deco/i);
+    const cantDecos = matchDeco ? parseInt(matchDeco[1]) : 0;
+
+    const matchExt = subservicio.match(/(\d+)\s*ext/i);
+    const cantExts = matchExt ? parseInt(matchExt[1]) : 0;
+
+    // 2. Opciones base del Modem
+    const modemSelect = document.getElementById('ferreteria-modem');
+    const opcionesHTML = modemSelect ? modemSelect.innerHTML : '<option value="">-- Seleccione --</option>';
+
+    // 3. Generar DECOS (Sin labels individuales)
+    const contenedorDecos = document.getElementById('contenedor-decos-ingreso');
+    if (contenedorDecos) {
+        contenedorDecos.innerHTML = '';
+        for (let i = 1; i <= cantDecos; i++) {
+            const select = document.createElement('select');
+            select.id = `deco-ingreso-${i}`;
+            select.className = 'form-control select-serie';
+            select.required = true;
+            select.style.cssText = 'width:100%; height:42px; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;';
+            select.innerHTML = opcionesHTML;
+            
+            // Personalizamos el placeholder interno
+            if(select.options[0]) select.options[0].text = `-- Seleccione Deco ${i} --`;
+            
+            contenedorDecos.appendChild(select);
+        }
+    }
+
+    // 4. Generar EXTENSORES (Sin labels individuales, estilo uniforme)
+    const contenedorExts = document.getElementById('contenedor-extensores-ingreso');
+    const labelTituloExt = document.getElementById('label-extensores-titulo');
     
-// =======================================================
-// --- FUNCIONES GLOBALES PARA TRANSFERENCIA DE MATERIALES ---
-// =======================================================
+    if (contenedorExts) {
+        contenedorExts.innerHTML = '';
+        if (cantExts > 0) {
+            if(labelTituloExt) labelTituloExt.style.display = 'block'; // Mostramos el título principal "Extensores *"
+            
+            for (let i = 1; i <= cantExts; i++) {
+                const select = document.createElement('select');
+                select.id = `extensor-ingreso-${i}`;
+                select.className = 'form-control select-serie';
+                select.required = true;
+                select.style.cssText = 'width:100%; height:42px; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;';
+                select.innerHTML = opcionesHTML;
+                
+                // Personalizamos el placeholder interno
+                if(select.options[0]) select.options[0].text = `-- Seleccione Extensor ${i} --`;
+
+                contenedorExts.appendChild(select);
+            }
+        } else {
+            if(labelTituloExt) labelTituloExt.style.display = 'none'; // Ocultamos el título si no hay extensores
+        }
+    }
+});
 
 /**
- * Muestra el stock de materiales disponibles para transferir desde un técnico.
- * @param {string} tecnicoId - El ID del técnico origen (opcional, se toma del select si no se pasa).
+ * Carga las series disponibles del stock del técnico en los selects de ingreso
  */
+function cargarStockEnSelectsIngreso() {
+    const tecnicoActivo = window.usuarioActivo;
+    if (!tecnicoActivo) return;
 
-window.mostrarStockOrigen = function(tecnicoId) {
-    const origenId = tecnicoId || document.getElementById('tec-origen')?.value;
-    
-    const divStock = document.getElementById('stock-origen');
-    const divDestino = document.getElementById('contenedor-destino');
-    const btnTrans = document.getElementById('btn-transferir');
-    const listaHtml = document.getElementById('lista-materiales-origen');
+    const tecnico = appData.empleados.find(emp => 
+        `${emp.nombre1} ${emp.apepaterno}`.trim() === tecnicoActivo.nombre
+    );
+    if (!tecnico?.stock?.equipos?.length) return;
 
-    if (!origenId) {
-        if(divStock) divStock.style.display = 'none';
-        if(divDestino) divDestino.style.display = 'none';
-        if(btnTrans) btnTrans.style.display = 'none';
-        return;
-    }
+    const opcionesEquipos = tecnico.stock.equipos.map(eq => {
+        const articulo = appData.articulos.seriados.find(a => a.codigo === eq.articuloCodigo);
+        const nombre = articulo?.nombre || eq.articuloCodigo;
+        return { value: eq.serie1, text: `${eq.serie1} (${nombre})` };
+    });
 
-    const origen = appData.empleados.find(e => e.id === origenId);
-    if (!origen || !origen.stock) {
-        listaHtml.innerHTML = '<p style="color:#6c757d; padding:10px;">Este técnico no tiene materiales asignados.</p>';
-        mostrarContenedores();
-        return;
-    }
-
-    let html = '';
-
-    // Renderizado de Equipos
-    if (origen.stock.equipos?.length > 0) {
-        html += `<h5 style="margin-top:15px; margin-bottom:8px; color:#007bff; border-bottom:1px solid #eee;">Equipos:</h5>`;
-        origen.stock.equipos.forEach(eq => {
-            const articulo = appData.articulos.seriados.find(a => a.codigo === eq.articuloCodigo);
-            html += `
-            <div class="lista-seriados-item">
-                <input type="checkbox" class="chk-transferir" onchange="actualizarResumenTransferencia()" 
-                    data-tipo="equipo" 
-                    data-serie1="${eq.serie1}" 
-                    data-serie2="${eq.serie2|| ''}" 
-                    data-codigo="${eq.articuloCodigo}" 
-                    data-guia="${eq.guiaAsignacion|| ''}">
-                <span class="articulo-y-serie">${articulo?.nombre || eq.articuloCodigo} - ${eq.serie1}${eq.serie2 ? ' / ' + eq.serie2 : ''}</span>
-            </div>`;
+    // Llenar select de Modem
+    const modemSelect = document.getElementById('ferreteria-modem');
+    if (modemSelect) {
+        modemSelect.innerHTML = '<option value="">-- Seleccione Modem --</option>';
+        opcionesEquipos.forEach(op => {
+            const opt = document.createElement('option');
+            opt.value = op.value;
+            opt.textContent = op.text;
+            modemSelect.appendChild(opt);
         });
     }
 
-    // === Tarjetas ===
-    if (origen.stock.tarjetas?.length > 0) {
-        html += `<h5 style="margin-top:15px; margin-bottom:8px; color:#007bff; border-bottom:1px solid #eee;">Tarjetas:</h5>`;
-        origen.stock.tarjetas.forEach(t => {
-            const articulo = appData.articulos.ferreteria.find(a => a.codigo === t.articuloCodigo);
-            html += `
-            <div class="lista-seriados-item">
-                <input type="checkbox" class="chk-transferir" onchange="actualizarResumenTransferencia()" 
-                    data-tipo="tarjeta" 
-                    data-serie="${t.serie}" 
-                    data-codigo="${t.articuloCodigo}" 
-                    data-guia="${t.guiaAsignacion|| ''}">
-                <span class="articulo-y-serie">${articulo?.nombre || t.articuloCodigo} - ${t.serie}</span>
-            </div>`;
+    // Llenar selects de Decos dinámicos
+    document.querySelectorAll('#contenedor-decos-ingreso .select-serie').forEach(select => {
+        select.innerHTML = '<option value="">-- Seleccione Serie --</option>';
+        opcionesEquipos.forEach(op => {
+            const opt = document.createElement('option');
+            opt.value = op.value;
+            opt.textContent = op.text;
+            select.appendChild(opt);
         });
-    }
+    });
 
-    // === LNBs ===
-    if (origen.stock.lnbs?.length > 0) {
-        html += `<h5 style="margin-top:15px; margin-bottom:8px; color:#007bff; border-bottom:1px solid #eee;">LNBs:</h5>`;
-        origen.stock.lnbs.forEach(lnb => {
-            const articulo = appData.articulos.lnbs.find(a => a.codigo === lnb.articuloCodigo);
-            html += `
-            <div class="lista-seriados-item">
-                <input type="checkbox" class="chk-transferir" onchange="actualizarResumenTransferencia()" 
-                    data-tipo="lnb" 
-                    data-serie="${lnb.serie}" 
-                    data-codigo="${lnb.articuloCodigo}" 
-                    data-guia="${lnb.guiaAsignacion|| ''}">
-                <span class="articulo-y-serie">${articulo?.nombre || lnb.articuloCodigo} - ${lnb.serie}</span>
-            </div>`;
+    // Llenar selects de Extensores dinámicos
+    document.querySelectorAll('#contenedor-extensores-ingreso .select-serie').forEach(select => {
+        select.innerHTML = '<option value="">-- Seleccione Serie --</option>';
+        opcionesEquipos.forEach(op => {
+            const opt = document.createElement('option');
+            opt.value = op.value;
+            opt.textContent = op.text;
+            select.appendChild(opt);
         });
-    }
-
-    listaHtml.innerHTML = html || '<p style="color:#6c757d; padding:10px;">Sin materiales disponibles.</p>';
-    mostrarContenedores();
-
-    function mostrarContenedores() {
-        if(divStock) divStock.style.display = 'block';
-        if(divDestino) divDestino.style.display = 'block';
-        if(btnTrans) btnTrans.style.display = 'inline-block';
-    }
+    });
 }
-
-/**
-* Transfiere materiales seleccionados entre técnicos y persiste los cambios en Supabase.
-*/
-
 
 // ══════════════════════════════════════════════════════
 // PUNTO 1: Limpiar decos que están en órdenes liquidadas pero siguen en stock
@@ -10267,6 +10699,7 @@ function cargarArticulosLNB() {
 }
 
 function cerrarSesion() {
+    sessionStorage.removeItem('usuarioActivo');
     window.location.reload(); // 🔄 Recarga la página completa
     
 }

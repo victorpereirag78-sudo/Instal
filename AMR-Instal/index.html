@@ -17,27 +17,27 @@
             <input type="text" id="login-rut" placeholder="RUT">
             <input type="password" id="login-pass" placeholder="Contraseña">
             <button id="btnLogin">Ingresar</button>
-            <p class="copyright">© 2025 Instal</p>
+            <p class="copyright">© 2026 Instal</p>
         </div>
     </div>
     <div id="app-container" style="display: none;">
-    <header id="main-header">
-        
+    <header id="main-header">        
         <nav id="main-nav">
             <!-- ✅ NUEVO: Menú independiente para Ingreso Clientes -->
             <button data-module="ingreso">Ingreso Clientes</button>
             <button data-module="dth">Despacho</button>
             <button data-module="rrhh">RRHH</button>
             <button data-module="logistica">Logística</button>
+            <button data-module="flota">Control de Flota</button>
+            <button data-module="panol">Pañol</button>
             <button data-module="gestion-orden">Gestión Orden</button>
             <button data-module="avance">Reportes</button>
         </nav>
         <div class="header-actions">
             <button id="btn-salir" class="btn-excel">Salir</button>
-            <span>© 2025 Instal</span>
+            <span>© 2026 Instal</span>
         </div>
-    </header>
-    
+    </header>    
     <div id="content-wrapper">
         <aside id="sidebar">
             <!-- ✅ Despacho -->
@@ -77,19 +77,35 @@
                     <h2>Logística</h2>
                     <ul>
                         <li><button data-panel="panel-ingreso-seriados">Ingreso de Equipos</button></li>
-                        <li><button data-panel="panel-ingreso-no-seriados">Ingreso de Tarjeta</button></li>
-                        <li><button data-panel="panel-ingreso-lnb">Ingreso de LNB</button></li>
+                        <li><button data-panel="panel-ingreso-no-seriados">Ingreso Ferretería</button></li>
                         <li><button data-panel="panel-asignacion-materiales">Asignación de Materiales</button></li>
-                        <li><button data-panel="panel-gestion-bodega">Gestión Bodega</button></li>
+                        <li><button data-panel="panel-gestion-bodega">Saldo Bodega</button></li>
+                        <li><button data-panel="panel-saldo-tecnico">Saldo Técnico</button></li>
                         <li><button data-panel="panel-transferencia">Transferencia de Materiales</button></li>
                         <li><button data-panel="panel-devolucion-equipos">Devolución de Equipos</button></li>
                         <!-- <li><button data-panel="panel-guia-salida">Guía de Salida</button></li> -->
-                        <!-- <li><button data-panel="panel-inventario">Inventario</button></li> -->
-                        <li><button data-panel="panel-saldo-tecnico">Saldo Técnico</button></li>
-                        <li><button data-panel="panel-gestion-equipos">Gestión Equipos</button></li>
+                        <!-- <li><button data-panel="panel-inventario">Inventario</button></li> -->                        
+                        <li><button data-panel="panel-gestion-equipos">Creación Equipos</button></li>
                         <li><button data-panel="panel-buscar-serie">Buscar Serie</button></li>
                         <li><button data-panel="panel-buscar-orden">Buscar Orden</button></li>
                         <li><button data-panel="panel-buscar-rut">Buscar por RUT</button></li>
+                        <li><button data-panel="panel-eliminar-serie">Eliminar Serie</button></li>
+                    </ul>
+                </div>
+                <div id="submenu-flota" class="submenu">
+                    <h2>Control flota</h2>
+                    <ul>
+                        <li><button data-panel="panel-flota-km">📊 Kilometraje</button></li>
+                        <li><button data-panel="panel-flota-prox-revision">🔧 Próxima Revisión</button></li>
+                        <li><button data-panel="panel-flota-actual">🚗 Kilometraje Actual</button></li>
+                    </ul>
+                </div>
+                <div id="submenu-panol" class="submenu">
+                    <h2>Pañol</h2>
+                    <ul>
+                        <li><button data-panel="panel-panol-herramientas">🔨 Herramientas</button></li>
+                        <li><button data-panel="panel-panol-epp">🦺 EPP</button></li>
+                        <li><button data-panel="panel-panol-uniformes">👕 Uniformes</button></li>
                     </ul>
                 </div>
                 <div id="submenu-gestion-orden" class="submenu">
@@ -140,7 +156,6 @@
                 <!-- ======================================================= -->
                 <!-- PANELES DE GESTIÓN ORDEN                                -->
                 <!-- ======================================================= -->
-
                 <!-- Panel: Eliminar Orden -->
                 <div id="panel-eliminar-orden" class="content-panel">
                     <div style="max-width:500px;">
@@ -258,168 +273,193 @@
                 <div id="panel-ingreso-cliente" class="content-panel">
                     <h2 id="titulo-ingreso-orden" style="margin: 0 0 16px 0; font-size: 1.2rem; color: #1a2a4a;">📝 Ingreso Orden</h2>
                     <div style="max-width: 860px; width: 100%;">
-                        <form id="form-ingreso-orden" style="display: block;">
-
-                            <!-- SECCIÓN: Identificación de la orden -->
-                            <div style="background: #f0f4ff; border-left: 4px solid #1a56db; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
-                                <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #1a56db; text-transform: uppercase; letter-spacing: 0.5px;">Identificación</p>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">N° Orden *</label>
-                                        <input type="text" id="orden-numero" placeholder="Ej: 123456" required
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;">
-                                    </div>
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Marca *</label>
-                                        <select id="orden-marca" required
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
-                                            <option value="">-- Seleccione --</option>
-                                            <option value="Claro">Claro</option>
-                                            <option value="VTR">VTR</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Tecnología *</label>
-                                        <select id="orden-tecnologia" required
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
-                                            <option value="">-- Seleccione --</option>
-                                            <option value="HFC">HFC</option>
-                                            <option value="Fibra">Fibra</option>
-                                        </select>
-                                    </div>
-                                </div>
+                <form id="form-ingreso-orden" style="display: block;">
+                    <!-- SECCIÓN: Identificación -->
+                    <div style="background: #f0f4ff; border-left: 4px solid #1a56db; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
+                        <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #1a56db; text-transform: uppercase; letter-spacing: 0.5px;">Identificación</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">N° Orden *</label>
+                                <input type="text" id="orden-numero" placeholder="Ej: 123456" required
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;">
                             </div>
-
-                            <!-- SECCIÓN: Datos del cliente -->
-                            <div style="background: #f0fff4; border-left: 4px solid #16a34a; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
-                                <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.5px;">Datos del Cliente</p>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Nombre completo Cliente *</label>
-                                        <input type="text" id="orden-nombre" placeholder="Nombre completo" required
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;">
-                                    </div>
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">RUT Cliente *</label>
-                                        <input type="text" id="orden-rut" placeholder="Ej: 12345678-9" required
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;">
-                                    </div>                                    
-                                </div>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Teléfono 1 *</label>
-                                        <input type="tel" id="numero_contacto" placeholder="Ej: 912345678" required
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;"
-                                            pattern="[0-9]{9}" title="Ingrese 9 dígitos">
-                                    </div>
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Teléfono 2</label>
-                                        <input type="tel" id="orden-telefono2" placeholder="Ej: 987654321"
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;"
-                                            pattern="[0-9]{9}" title="Ingrese 9 dígitos">
-                                    </div>
-                                </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Marca *</label>
+                                <select id="orden-marca" required
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Claro">Claro</option>
+                                    <option value="VTR">VTR</option>
+                                </select>
                             </div>
-
-                            <!-- SECCIÓN: Ubicación -->
-                            <div style="background: #fffbeb; border-left: 4px solid #d97706; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
-                                <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #d97706; text-transform: uppercase; letter-spacing: 0.5px;">Ubicación</p>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                                    <input type="hidden" id="orden-region" value="13">
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Comuna *</label>
-                                        <select id="orden-comuna" required
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
-                                            <option value="">-- Seleccione Comuna --</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Dirección *</label>
-                                    <input type="text" id="orden-direccion" placeholder="Calle, número, depto, referencias" required
-                                        style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;">
-                                </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Tecnología *</label>
+                                <select id="orden-tecnologia" required
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="HFC">HFC</option>
+                                    <option value="Fibra">Fibra</option>
+                                </select>
                             </div>
-
-                            <!-- SECCIÓN: Servicio -->
-                            <div style="background: #fdf2f8; border-left: 4px solid #9333ea; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
-                                <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #9333ea; text-transform: uppercase; letter-spacing: 0.5px;">Servicio</p>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Servicio *</label>
-                                        <select id="orden-servicio" required
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
-                                            <option value="">-- Seleccione Servicio --</option>
-                                            <!-- ✅ Las opciones se cargarán dinámicamente desde JS -->
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Subservicio *</label>
-                                        <select id="orden-sub" required
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
-                                            <option value="">-- Seleccione Subservicio --</option>
-                                            <!-- ✅ Las opciones se cargarán dinámicamente desde JS -->
-                                        </select>
-                                    </div>
-                                </div>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Fecha Instalación *</label>
-                                        <input type="date" id="orden-fecha"
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;">
-                                    </div>
-                                    <div>
-                                        <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Despacho *</label>
-                                        <select id="orden-despacho"
-                                            style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
-                                            <option value="">-- Seleccione --</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- SECCIÓN: Técnico y Observación -->
-                            <div style="background: #f8fafc; border-left: 4px solid #64748b; border-radius: 8px; padding: 12px 16px; margin-bottom: 18px;">
-                                <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Asignación y Notas</p>
-                                <div style="margin-bottom: 10px;">
-                                    <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Técnico Asignado</label>
-                                    <select id="orden-tecnico"
-                                        style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
-                                        <option value="">-- Se asignará por despacho --</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Observación</label>
-                                    <textarea id="orden-observacion" rows="3" placeholder="Notas adicionales, referencias de acceso, etc..."
-                                        style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; resize:vertical;"></textarea>
-                                </div>
-                            </div>
-
-                            <!-- BOTONES -->
-                            <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                                <button type="submit"
-                                    style="flex:1; min-width:160px; padding:13px; background:linear-gradient(135deg,#28a745,#20c997); color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(40,167,69,0.3);">
-                                    ✅ Guardar Orden
-                                </button>
-                                <button type="button" id="btnCancelarIngreso"
-                                    style="flex:1; min-width:120px; padding:13px; background:#6c757d; color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">
-                                    Cancelar
-                                </button>
-                            </div>
-
-                            <style>
-                            @media (max-width: 600px) {
-                                #panel-ingreso-cliente [style*="grid-template-columns: 1fr 1fr 1fr"] {
-                                    grid-template-columns: 1fr !important;
-                                }
-                                #panel-ingreso-cliente [style*="grid-template-columns: 1fr 1fr"] {
-                                    grid-template-columns: 1fr !important;
-                                }
-                            }
-                            </style>
-                        </form>
+                        </div>
                     </div>
+
+                    <!-- SECCIÓN: Datos del cliente -->
+                    <div style="background: #f0fff4; border-left: 4px solid #16a34a; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
+                        <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.5px;">Datos del Cliente</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Nombre completo Cliente *</label>
+                                <input type="text" id="orden-nombre" placeholder="Nombre completo" required
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">RUT Cliente *</label>
+                                <input type="text" id="orden-rut" placeholder="Ej: 12345678-9" required
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Teléfono 1 *</label>
+                                <input type="tel" id="numero_contacto" placeholder="Ej: 912345678" required
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Teléfono 2</label>
+                                <input type="tel" id="orden-telefono2" placeholder="Ej: 987654321"
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN: Ubicación -->
+                    <div style="background: #fffbeb; border-left: 4px solid #d97706; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
+                        <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #d97706; text-transform: uppercase; letter-spacing: 0.5px;">Ubicación</p>
+                        <input type="hidden" id="orden-region" value="13">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Comuna *</label>
+                                <select id="orden-comuna" required
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
+                                    <option value="">-- Seleccione Comuna --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Dirección *</label>
+                            <input type="text" id="orden-direccion" placeholder="Calle, número, depto, referencias" required
+                                style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box;">
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN: Servicio -->
+                    <div style="background: #fdf2f8; border-left: 4px solid #9333ea; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
+                        <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #9333ea; text-transform: uppercase; letter-spacing: 0.5px;">Servicio</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Servicio *</label>
+                                <select id="orden-servicio" required
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
+                                    <option value="">-- Seleccione Servicio --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Subservicio *</label>
+                                <select id="orden-sub" required
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
+                                    <option value="">-- Seleccione Subservicio --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ✅ SECCIÓN: Equipos y Ferretería (REMODIFICADA) -->
+                    <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
+                        <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #0ea5e9; text-transform: uppercase; letter-spacing: 0.5px;">Equipos y Ferretería</p>
+                        
+                        <!-- Fila 1: Modem + Decos dinámicos (mismo ancho) -->
+                        <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
+                            <p style="margin: 0 0 12px 0; font-size: 12px; font-weight: 700; color: #0ea5e9; text-transform: uppercase; letter-spacing: 0.5px;">Equipos y Ferretería</p>
+                            
+                            <div style="margin-bottom: 14px;">
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Modem *</label>
+                                <select id="ferreteria-modem" class="form-control select-serie" required
+                                    style="width:100%; height:42px; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; background:#fff;">
+                                    <option value="">-- Seleccione Modem --</option>
+                                </select>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
+                                <div>
+                                    <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Decos *</label>
+                                    <div id="contenedor-decos-ingreso" style="display:flex; flex-direction:column; gap:8px;">
+                                        </div>
+                                </div>
+
+                                <div>
+                                    <label id="label-extensores-titulo" style="display:none; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Extensores *</label>
+                                    <div id="contenedor-extensores-ingreso" style="display:flex; flex-direction:column; gap:8px;">
+                                        </div>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-top: 1px dashed #cbd5e1; padding-top: 12px;">
+                                <div>
+                                    <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Conectores</label>
+                                    <input type="number" id="ferreteria-conectores" value="0" min="0"
+                                        style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; height:42px;">
+                                </div>
+                                <div>
+                                    <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Cable (mts)</label>
+                                    <input type="text" id="ferreteria-cable" placeholder="Ej: 7 mts"
+                                        style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; height:42px;">
+                                </div>
+                            </div>
+                        </div>
+
+                    <!-- SECCIÓN: Recepción -->
+                    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
+                        <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #d97706; text-transform: uppercase; letter-spacing: 0.5px;">Recepción</p>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Persona que Recibe *</label>
+                                <input type="text" id="orden-nombre-recibe" placeholder="Nombre completo de quien recibe" required
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; height:42px;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Teléfono Contacto *</label>
+                                <input type="tel" id="orden-telefono-recibe" placeholder="+56 9 1234 5678" required
+                                    style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; height:42px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN: Asignación y Notas -->
+                    <div style="background: #f8fafc; border-left: 4px solid #64748b; border-radius: 8px; padding: 12px 16px; margin-bottom: 18px;">
+                        <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Asignación y Notas</p>
+                        <!-- Técnico oculto (auto-asignado) -->
+                        <input type="hidden" id="orden-tecnico">
+                        <!-- Despacho eliminado -->
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;">Observación</label>
+                            <textarea id="orden-observacion" rows="3" placeholder="Notas adicionales, referencias de acceso, etc..."
+                                style="width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; box-sizing:border-box; resize:vertical;"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- BOTONES -->
+                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                        <button type="submit"
+                            style="flex:1; min-width:160px; padding:13px; background:linear-gradient(135deg,#28a745,#20c997); color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(40,167,69,0.3);">
+                            ✅ Guardar Orden
+                        </button>
+                        <button type="button" id="btnCancelarIngreso"
+                            style="flex:1; min-width:120px; padding:13px; background:#6c757d; color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
                 </div>
                 <div id="panel-agendadas" class="content-panel" style="display: none;">
                     <div class="sticky-header">
@@ -873,33 +913,7 @@
                             </div>
                         </form>
                     </div>
-                </div>
-                <div id="panel-ingreso-lnb" class="content-panel" style="display: none;">
-                    <h2>Ingreso de LNB</h2>
-                    <div class="form-container">
-                        <form id="form-ingreso-lnb">
-                        <div class="form-group">
-                            <label for="guia-lnb">N° de Guía:</label>
-                            <input type="text" id="guia-lnb" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="fecha-ingreso-lnb">Fecha de Ingreso:</label>
-                            <input type="date" id="fecha-ingreso-lnb" required> <!-- ✅ ID CORREGIDO -->
-                        </div>
-                        <div class="form-group">
-                            <label for="articulo-lnb">Artículo LNB:</label>
-                            <select id="articulo-lnb" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="archivo-excel-lnb">Cargar Excel (1 columna: Código):</label>
-                            <input type="file" id="archivo-excel-lnb" accept=".xlsx, .xls" required>
-                        </div>
-                        <div class="form-group full-width">
-                            <button type="submit">Registrar Ingreso LNB</button>
-                        </div>
-                        </form>
-                    </div>
-                    </div>
+                </div>                
                 <div id="panel-asignacion-materiales" class="content-panel" style="display: none;">
                     <h2>Asignación de Materiales</h2>
                     <div class="form-container">
@@ -912,8 +926,7 @@
                             <select id="tipo-asignacion" required>
                                 <option value="">-- Seleccione --</option>
                                 <option value="equipo">Equipo</option>
-                                <option value="tarjeta">Tarjeta</option>
-                                <option value="lnb">LNB</option>
+                                <option value="ferreteria">Ferreteria</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1155,24 +1168,8 @@
                     <div class="form-container">
                         <div style="display: flex; gap: 12px; margin-bottom: 24px;">
                             <button id="btn-crear-seriado" class="btn-excel">➕ Crear Equipo</button>
-                            <button id="btn-crear-ferreteria" class="btn-excel">➕ Crear Tarjeta</button>
-                            <button id="btn-crear-LNB" class="btn-excel">➕ Crear LNB</button>
+                            <button id="btn-crear-ferreteria" class="btn-excel">➕ Crear Ferreteria</button>
                         </div>
-                        <form id="form-crear-lnb" style="display: none; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-                            <input type="hidden" id="tipo-articulo-lnb" value="lnb">
-                            <div class="form-group">
-                                <label for="articulo-nombre-lnb">Nombre del LNB:</label>
-                                <input type="text" id="articulo-nombre-lnb" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="articulo-codigo-lnb">Código Único:</label>
-                                <input type="text" id="articulo-codigo-lnb" required>
-                            </div>
-                            <div class="form-group full-width">
-                                <button type="submit">💾 Guardar LNB</button>
-                                <button type="button" id="btn-cancelar-crear-lnb" style="margin-left: 10px; background: #6c757d; color: white;">Cancelar</button>
-                            </div>
-                            </form>
                         <form id="form-crear-articulo" style="display: none; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
                             <input type="hidden" id="tipo-articulo">
                             <div class="form-group">
@@ -1182,6 +1179,20 @@
                             <div class="form-group">
                                 <label for="articulo-codigo">Código Único:</label>
                                 <input type="text" id="articulo-codigo" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Operador</label>
+                                <select id="articulo-operador" class="form-control">
+                                    <option value="Claro">Claro</option>
+                                    <option value="VTR">VTR</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tecnología</label>
+                                <select id="articulo-tecnologia" class="form-control">
+                                    <option value="Fibra">Fibra</option>
+                                    <option value="HFC">HFC</option>
+                                </select>
                             </div>
                             <div class="form-group full-width">
                                 <button type="submit">💾 Guardar Artículo</button>
@@ -1323,8 +1334,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
-                              
+                </div>                              
                 <!-- ============================================ -->
                 <!-- PANEL DE REPORTES DE PRODUCCIÓN -->
                 <!-- ============================================ -->
@@ -1455,6 +1465,74 @@
                         
                     </div>
                 </div>
+                <!-- ✅ CONTROL DE FLOTA -->
+                <div id="panel-flota-km" class="content-panel" style="display:none;">
+                    <div style="background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <h2 style="margin:0; color:#1e293b;">📊 Registro de Kilometraje</h2>
+                            <button onclick="abrirModalFlota()" style="padding:8px 16px; background:#007bff; color:white; border:none; border-radius:6px; cursor:pointer;">➕ Nuevo Vehículo</button>
+                        </div>
+                        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+                            <thead><tr style="background:#f8f9fa; text-align:left;"><th style="padding:12px;">Patente</th><th>Vehículo</th><th>KM Actual</th><th>Estado</th><th style="padding:12px;">Acciones</th></tr></thead>
+                            <tbody id="tabla-flota-km"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="panel-flota-prox-revision" class="content-panel" style="display:none;">
+                    <div style="background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                        <h2 style="margin:0 0 20px; color:#1e293b;">🔧 Vehículos por Revisión</h2>
+                        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+                            <thead><tr style="background:#fff3cd; text-align:left;"><th style="padding:12px;">Patente</th><th>Vehículo</th><th>KM Actual</th><th>KM Próxima Revisión</th><th>Días Restantes</th></tr></thead>
+                            <tbody id="tabla-flota-prox"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="panel-flota-actual" class="content-panel" style="display:none;">
+                    <div style="background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                        <h2 style="margin:0 0 20px; color:#1e293b;">🚗 Vista Rápida: Kilometraje Actual</h2>
+                        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+                            <thead><tr style="background:#d1fae5; text-align:left;"><th style="padding:12px;">Patente</th><th>Vehículo</th><th>KM Actual</th><th>Última Actualización</th></tr></thead>
+                            <tbody id="tabla-flota-actual"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- ✅ PAÑOL -->
+                <div id="panel-panol-herramientas" class="content-panel" style="display:none;">
+                    <div style="background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <h2 style="margin:0; color:#1e293b;">🔨 Inventario: Herramientas</h2>
+                            <button onclick="abrirModalPañol('herramientas')" style="padding:8px 16px; background:#10b981; color:white; border:none; border-radius:6px; cursor:pointer;">➕ Agregar</button>
+                        </div>
+                        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+                            <thead><tr style="background:#f8f9fa;"><th style="padding:12px;">Nombre</th><th>Código</th><th>Stock</th><th>Ubicación</th><th>Estado</th></tr></thead>
+                            <tbody id="tabla-panol-herramientas"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="panel-panol-epp" class="content-panel" style="display:none;">
+                    <div style="background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <h2 style="margin:0; color:#1e293b;">🦺 Inventario: EPP</h2>
+                            <button onclick="abrirModalPañol('epp')" style="padding:8px 16px; background:#f59e0b; color:white; border:none; border-radius:6px; cursor:pointer;">➕ Agregar</button>
+                        </div>
+                        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+                            <thead><tr style="background:#f8f9fa;"><th style="padding:12px;">Nombre</th><th>Talla/Modelo</th><th>Stock</th><th>Vencimiento</th><th>Estado</th></tr></thead>
+                            <tbody id="tabla-panol-epp"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="panel-panol-uniformes" class="content-panel" style="display:none;">
+                    <div style="background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <h2 style="margin:0; color:#1e293b;">👕 Inventario: Uniformes</h2>
+                            <button onclick="abrirModalPañol('uniformes')" style="padding:8px 16px; background:#6366f1; color:white; border:none; border-radius:6px; cursor:pointer;">➕ Agregar</button>
+                        </div>
+                        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+                            <thead><tr style="background:#f8f9fa;"><th style="padding:12px;">Nombre</th><th>Talla</th><th>Stock</th><th>Entregados</th><th>Disponible</th></tr></thead>
+                            <tbody id="tabla-panol-uniformes"></tbody>
+                        </table>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -1502,10 +1580,7 @@
                         style="padding:9px 12px; border:1px solid #ced4da; border-radius:6px; font-size:14px; width:100%; box-sizing:border-box;">
                 </div>
             </div>
-
-            <!-- Series (decos, tarjetas, LNB, retirados) -->
             <div id="contenedor-series" style="margin-bottom:20px;"></div>
-
             <!-- Ferretería -->
             <div id="contenedor-ferreteria" style="background:#f8f9fa; border:1px solid #dee2e6; border-radius:10px; padding:15px 20px; margin-bottom:20px;">
                 <h4 style="margin:0 0 12px; color:#003366; font-size:1em; font-weight:700; border-bottom:2px solid #007bff; padding-bottom:8px;">🔧 Ferretería Utilizada</h4>
@@ -1514,16 +1589,7 @@
                         <label style="font-weight:600; font-size:13px; color:#333;">Conectores:</label>
                         <input type="number" id="ferreteria-conectores" placeholder="Ej: 4" min="0"
                             style="padding:8px 10px; border:1px solid #ced4da; border-radius:6px; font-size:14px;">
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <label style="font-weight:600; font-size:13px; color:#333;">LNB:</label>
-                        <select id="ferreteria-lnb" style="padding:8px 10px; border:1px solid #ced4da; border-radius:6px; font-size:14px;">
-                            <option value="">-- Seleccione --</option>
-                            <option value="Quad">Quad</option>
-                            <option value="Dual">Dual</option>
-                            <option value="Movistar">Movistar</option>
-                        </select>
-                    </div>
+                    </div>                    
                     <div style="display:flex; flex-direction:column; gap:4px;">
                         <label style="font-weight:600; font-size:13px; color:#333;">Cable (metros):</label>
                         <input type="number" id="ferreteria-cable" placeholder="Ej: 25" min="0" step="0.5"
@@ -1634,7 +1700,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const hoy = new Date().toISOString().split('T')[0];
-            ['fecha-nmalos', 'fecha-reversa', 'fecha-ingreso-seriados', 'fecha-ingreso-tarjetas', 'fecha-ingreso-lnb'].forEach(id => {
+            ['fecha-nmalos', 'fecha-reversa', 'fecha-ingreso-seriados'].forEach(id => {
                 const input = document.getElementById(id);
                 if (input && !input.value) input.value = hoy;
             });
