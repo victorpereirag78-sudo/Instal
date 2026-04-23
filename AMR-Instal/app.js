@@ -13,18 +13,7 @@ function mostrarLoader(mensaje = 'Cargando...') {
     if (!loader) {
         const div = document.createElement('div');
         div.id = 'global-loader';
-<<<<<<< HEAD
         div.innerHTML = `<div class="loader-backdrop"><div class="loader-content"><div class="spinner"></div><p>${mensaje}</p></div></div>`;
-=======
-        div.innerHTML = `
-            <div class="loader-backdrop">
-                <div class="loader-content">
-                    <div class="spinner"></div>
-                    <p>${mensaje}</p>
-                </div>
-            </div>
-        `;
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
         document.body.appendChild(div);
         loader = div; // ← asignar el nuevo elemento a loader
     }
@@ -193,12 +182,10 @@ puntajesServicios: {
         // === REPARACION ===
         "VT": 1
     },
-<<<<<<< HEAD
+
     flota: [],
     panol: { herramientas: [], epp: [], uniformes: [] },
-=======
 
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
     personal: {
         despacho: [],
         tecnicos: []
@@ -265,8 +252,7 @@ let asignacionActiva = {           // Estado actual de la asignación
         'panel-asignacion-materiales': 'logistica',
         'panel-bodega-malos': 'logistica',
         'panel-bodega-reversa': 'logistica',
-        
-<<<<<<< HEAD
+
         // Dentro de moduloPorPanel:
         'panel-flota-km': 'flota',
         'panel-flota-prox-revision': 'flota',
@@ -277,8 +263,6 @@ let asignacionActiva = {           // Estado actual de la asignación
         'panel-panol-existencia': 'panol',
         'panel-panol-existencia': 'panol',
 
-=======
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
         // Reportes / Avance
         'reportes-produccion': 'avance',
         
@@ -377,13 +361,9 @@ function obtenerPuntajeSubservicio(subservicio) {
     return puntaje !== undefined ? puntaje : 0;
 }
 
-<<<<<<< HEAD
-=======
 function generarSufijoPorRegion(regionId) {
     return regionId === "14" ? "-R" : "-L";
 }
-
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
 function esCargoTecnico(nombre) {
     if (!nombre) return false;
     const normalizado = nombre.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -509,7 +489,6 @@ function login() {
 
 function filtrarModulosPorRol(rol, panelIdActual = null) {
     const permisos = {
-<<<<<<< HEAD
         'admin': ['ingreso', 'dth', 'rrhh', 'gestion-orden', 'avance', 'logistica', 'flota', 'panol'],
         'rrhh': ['rrhh', 'flota', 'panol'],
         'despacho N1': ['ingreso', 'dth', 'flota', 'panol'],
@@ -522,48 +501,22 @@ function filtrarModulosPorRol(rol, panelIdActual = null) {
     const panelId = panelIdActual || document.querySelector('#main-content .content-panel.active')?.id || 'modulo-bienvenida';
     const moduloRequerido = moduloPorPanel[panelId];
 
-=======
-        'admin': ['ingreso', 'dth', 'rrhh', 'gestion-orden', 'avance', 'logistica'],
-        'rrhh': ['rrhh'],
-        'despacho N1': ['ingreso', 'dth'],
-        'despacho N2': ['ingreso', 'dth', 'logistica'],
-        'logistica': ['logistica'],
-        'lector': ['dth', 'logistica', 'avance']
-    };
-    
-    const modulosPermitidos = permisos[rol] || [];
-    
-    // ✅ FIX: Usar panelIdActual o buscar el panel activo
-    const panelId = panelIdActual || document.querySelector('#main-content .content-panel.active')?.id || 'modulo-bienvenida';
-    const moduloRequerido = moduloPorPanel[panelId];
-    
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
     if (moduloRequerido && !modulosPermitidos.includes(moduloRequerido)) {
         mostrarToast("⚠️ No tienes permisos para acceder a esta sección.", "error");
         return false;
     }
-<<<<<<< HEAD
-
     // ✅ FIX: Cambiamos 'button' por '[data-module]' para que coincida con tus <a> del HTML
     document.querySelectorAll('#main-nav [data-module]').forEach(btn => {
         const modulo = btn.dataset.module;
         if (modulosPermitidos.includes(modulo)) {
             btn.style.display = 'flex'; // o 'block' según tu CSS
-=======
-    
-    // Filtrar menú horizontal
-    document.querySelectorAll('#main-nav button[data-module]').forEach(btn => {
-        const modulo = btn.dataset.module;
-        if (modulosPermitidos.includes(modulo)) {
-            btn.style.display = 'block';
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
+
         } else {
             btn.style.display = 'none';
             btn.classList.remove('active');
         }
     });
 
-<<<<<<< HEAD
     // Marcar visualmente el primer botón visible
     const primerBotonVisible = document.querySelector('#main-nav [data-module]:not([style*="display: none"])');
     if (primerBotonVisible) {
@@ -574,19 +527,6 @@ function filtrarModulosPorRol(rol, panelIdActual = null) {
     return true;
 }
 
-=======
-    // Solo marcar visualmente el primer botón visible, SIN navegar
-    const primerBotonVisible = document.querySelector('#main-nav button[data-module]:not([style*="display: none"])');
-    if (primerBotonVisible) {
-        document.querySelectorAll('#main-nav button').forEach(b => b.classList.remove('active'));
-        primerBotonVisible.classList.add('active');
-    }
-    
-    return true;
-}
-
-
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
 function seleccionarModulo(moduloId) {
     if (timeoutBienvenida) {
         clearTimeout(timeoutBienvenida);
@@ -663,21 +603,14 @@ function mostrarPanel(panelId) {
     if (moduloRequerido) {
         // Solo verificar permisos, sin redirigir ni llamar seleccionarModulo
         const permisos = {
-<<<<<<< HEAD
-            'admin': ['ingreso', 'dth', 'rrhh', 'gestion-orden', 'avance', 'logistica', 'flota', 'panol'], // ✅ Agregados
+
+            'admin': ['ingreso', 'dth', 'rrhh', 'gestion-orden', 'avance', 'logistica', 'flota', 'panol'],
             'rrhh': ['rrhh', 'flota', 'panol'],
             'despacho N1': ['ingreso', 'dth', 'flota', 'panol'],
             'despacho N2': ['ingreso', 'dth', 'logistica', 'flota', 'panol'],
             'logistica': ['logistica', 'flota', 'panol'],
             'lector': ['dth', 'logistica', 'avance']
-=======
-            'admin':        ['ingreso', 'dth', 'rrhh', 'gestion-orden', 'avance', 'logistica'],
-            'rrhh':         ['rrhh'],
-            'despacho N1':  ['ingreso', 'dth'],
-            'despacho N2':  ['ingreso', 'dth', 'logistica'],
-            'logistica':    ['logistica'],
-            'lector':       ['dth', 'logistica', 'avance']
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
+
         };
         const rol = usuario?.rol || 'admin';
         const modulosPermitidos = permisos[rol] || [];
@@ -687,15 +620,17 @@ function mostrarPanel(panelId) {
         }
 
         // Activar el módulo correcto en el menú superior
+        const moduloActual = document.querySelector('#main-nav button.active')?.dataset.module;
+const moduloVisual = moduloActual || moduloPorPanel[panelId];
         document.querySelectorAll('#main-nav button').forEach(b => {
             b.classList.remove('active');
-            if (b.dataset.module === moduloRequerido) b.classList.add('active');
+            if (b.dataset.module === moduloVisual) b.classList.add('active');
         });
-        
+
         // Activar el submenu correcto en la barra lateral (excepto ingreso que no tiene submenu)
         document.querySelectorAll('#sidebar .submenu').forEach(s => s.classList.remove('active'));
-        if (moduloRequerido !== 'ingreso') {
-            const submenuActivo = document.getElementById(`submenu-${moduloRequerido}`);
+        if (moduloVisual && moduloVisual !== 'ingreso') {
+            const submenuActivo = document.getElementById(`submenu-${moduloVisual}`);
             if (submenuActivo) submenuActivo.classList.add('active');
         }
     }
@@ -803,8 +738,6 @@ function mostrarPanel(panelId) {
             if (Object.keys(appData.servicios).length > 0) {
                 populateSelect(document.getElementById('filtro-servicio'), Object.keys(appData.servicios).map(s => ({ value: s, text: s })), "Todos los Servicios");
             }
-<<<<<<< HEAD
-
             // ✅ FIX COMUNAS: usar .onchange en lugar de cloneNode para evitar
             // que referencias a variables locales queden en listeners huérfanos
             const regionFiltroEl = document.getElementById('filtro-region');
@@ -822,33 +755,14 @@ function mostrarPanel(panelId) {
                     }
                     aplicarFiltros();
                 };
-=======
-            const regionFiltroEl = document.getElementById("filtro-region");
-            if (regionFiltroEl) {
-                populateSelect(regionFiltroEl, Object.keys(appData.regiones).map(num => ({ value: num, text: appData.regiones[num].nombre })), "Todas las Regiones");
-                // ✅ FIX: Clonar para eliminar listeners duplicados acumulados
-                const regionFiltroNuevo = regionFiltroEl.cloneNode(true);
-                regionFiltroEl.parentNode.replaceChild(regionFiltroNuevo, regionFiltroEl);
-                regionFiltroNuevo.addEventListener('change', () => {
-                    cargarComunas(document.getElementById('filtro-comuna'), regionFiltroNuevo);
-                    aplicarFiltros();
-                });
-                cargarComunas(document.getElementById('filtro-comuna'), regionFiltroNuevo);
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
             }
 
             const comunaFiltroEl = document.getElementById('filtro-comuna');
             if (comunaFiltroEl) {
-<<<<<<< HEAD
                 comunaFiltroEl.onchange = aplicarFiltros;
                 // Limpiar comunas al entrar al panel (sin región seleccionada)
                 populateSelect(comunaFiltroEl, [], 'Seleccione Comuna');
-=======
-                // ✅ FIX: Clonar también el de comuna para evitar duplicados
-                const comunaFiltroNuevo = comunaFiltroEl.cloneNode(true);
-                comunaFiltroEl.parentNode.replaceChild(comunaFiltroNuevo, comunaFiltroEl);
-                comunaFiltroNuevo.addEventListener('change', aplicarFiltros);
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
+
             }
 
             const filtrosContainer = document.querySelector('#panel-agendadas .filtros-container');
@@ -934,7 +848,6 @@ function mostrarPanel(panelId) {
             cargarArticulosLNB();
             break;
 
-<<<<<<< HEAD
         // Dentro de mostrarPanel(), después del switch pero antes de cerrar la función
         if (panelId.startsWith('panel-panol-')) {
             const cat = panelId.replace('panel-panol-', '');
@@ -945,8 +858,6 @@ function mostrarPanel(panelId) {
             }
         }
 
-=======
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
         // ✅ LIMPIEZA AUTOMÁTICA AL ENTRAR A BÚSQUEDAS
         case 'panel-buscar-orden':
             document.getElementById('buscar-orden-input').value = '';
@@ -979,10 +890,6 @@ function mostrarPanel(panelId) {
             if (resEl) resEl.innerHTML = '';
             break;
     }
-<<<<<<< HEAD
-    
-=======
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
 }
 
 // ═══════════════════════════════════════════════════
@@ -2638,11 +2545,7 @@ function abrirEdicionEmpleado(empleadoId) {
 }
 
 // =======================================================
-<<<<<<< HEAD
 // === GUARDAR EDICIÓN DE EMPLEADO ===
-=======
-// === GUARDAR EDICIÓN DE EMPLEADO - CORREGIDA ===
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
 // =======================================================
 async function guardarEdicionEmpleado(event) {
     if (event) event.preventDefault();
@@ -4095,8 +3998,6 @@ async function cargarDatos() {
         console.log("✅ Usuario admin creado en Supabase");
     }
 
-    console.log("✅ Logística y RRHH cargados desde Supabase");
-
     } catch (err) {
         console.error("❌ Error al cargar datos:", err);
         // Inicializar estructuras vacías en caso de error
@@ -4133,18 +4034,14 @@ async function cargarDatos() {
     });
 
     // === Cargar órdenes (paginado con ordenamiento determinista) ===
-    try {
-        console.log('🔄 Iniciando carga de órdenes desde Supabase...');
-        
+    try {        
         let todasLasOrdenes = [];
         let desde = 0;
         const tamañoPagina = 1000;
         let hayMas = true;
         let pagina = 1;
 
-        while (hayMas) {
-            console.log(`📄 Página ${pagina}: cargando desde ${desde}...`);
-            
+        while (hayMas) {            
             // ✅ ORDENAMIENTO DETERMINISTA: fecha + id
             const { data, error, count } = await supabase
                 .from('ordenes')
@@ -4159,7 +4056,6 @@ async function cargarDatos() {
                 // ✅ Verificar duplicados por ID antes de concatenar
                 const nuevosIds = new Set(data.map(o => o.id));
                 const existentes = new Set(todasLasOrdenes.map(o => o.id));
-                
                 const sinDuplicados = data.filter(o => !existentes.has(o.id));
                 todasLasOrdenes = [...todasLasOrdenes, ...sinDuplicados];
                 
@@ -4182,18 +4078,12 @@ async function cargarDatos() {
             coordenadas: o.coordenadas || ''
         }));
         
-        console.log(`🎉 Carga completa: ${ordenes.length} órdenes únicas en memoria`);
-        
         // 🔍 DEBUG: Verificar las órdenes problemáticas
         const problematicas = ['145178-L', '147644-L', '147549-L', '88190-R'];
         console.log('\n🔍 Verificación de órdenes específicas:');
         problematicas.forEach(num => {
             const existe = ordenes.some(o => o.numero === num);
             const enSupa = existe ? '✅ EN MEMORIA' : '❌ NO CARGADA';
-<<<<<<< HEAD
-=======
-            console.log(`  ${num}: ${enSupa}`);
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
         });
         
     } catch (err) {
@@ -5424,8 +5314,7 @@ align-items: center; justify-content: center; z-index: 3000;`;
 async function buscarSerieEnSupabase(terminoNorm) {
     const tablas = [
         { tabla: 'ingresos_seriados', campo: 'equipos',  tipo: 'equipo'  },
-        { tabla: 'ingresos_tarjetas', campo: 'tarjetas', tipo: 'tarjeta' },
-        { tabla: 'ingresos_lnb',      campo: 'lnbs',     tipo: 'lnb'     }
+        { tabla: 'ingresos_tarjetas', campo: 'tarjetas', tipo: 'tarjeta' }
     ];
 
     let resultados = [];
@@ -5483,7 +5372,6 @@ async function buscarSerie() {
         const todasLasSeries = [
             ...(o.series_entrada || []),
             ...(o.series_tarjetas || []),
-            ...(o.series_lnb || []),
             ...(o.series_salida || [])
         ]
         .filter(s => s !== null && s !== undefined)
@@ -5519,10 +5407,9 @@ async function buscarSerie() {
 
         buscarEnIngresos(appData.ingresosSeriados, 'seriado');
         if (codigoReal === '—') buscarEnIngresos(appData.ingresosTarjetas, 'ferreteria');
-        if (codigoReal === '—') buscarEnIngresos(appData.ingresosLNB, 'lnbs');
 
         resultados.push({
-            tipo: 'Equipo/Tarjeta/LNB',
+            tipo: 'Equipo/Tarjeta',
             guia: guiaReal,
             fecha: o.fecha,
             codigoArticulo: codigoReal !== '—' ? codigoReal : (o.articulo_codigo || '—'),
@@ -7839,29 +7726,6 @@ function verificarBotonLiquidacion() {
     }
 }
 
-<<<<<<< HEAD
-=======
-
-
-// === FUNCIÓN DE PRUEBA (accede a la variable global `supabase`) ===
-async function pruebaSupabase() {
-    if (!supabase) {
-        mostrarToast('❌ Supabase no inicializado. Verifica la consola.', 'error');
-        console.error('Supabase es null o undefined');
-        return;
-    }
-    try {
-        const { data, error } = await supabase.from('ordenes').select('*').limit(1);
-        if (error) throw error;
-        mostrarToast('✅ Conexión a Supabase OK', 'success');
-        console.log('Ejemplo de dato:', data[0]);
-    } catch (err) {
-        console.error('❌ Error al conectar con Supabase:', err);
-        mostrarToast('Error: ' + (err.message || 'Falló la conexión'), 'error');
-    }
-}
-
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
 /**
  * Procesa un archivo Excel para asignación masiva de materiales a técnicos.
  * El Excel debe contener columnas: nombre_tecnico (o rut_tecnico) y serie.
@@ -8336,10 +8200,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const el = document.getElementById(id);
             if (el) {
                 el.addEventListener(event, handler);
-<<<<<<< HEAD
-=======
-                console.log(`✅ Listener agregado: ${id} - ${event}`);
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
             }
         };
         
@@ -8377,7 +8237,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                     }, 150);
                 }
-<<<<<<< HEAD
 
                 // === PAÑOL: cargar datos al navegar ===
                 if (panelId.startsWith('panel-panol-')) {
@@ -8396,8 +8255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const vistaMap = { 'km': 'km', 'prox-revision': 'prox', 'actual': 'actual' };
                     if (typeof renderFlota === 'function') renderFlota(vistaMap[view] || 'km');
                 }
-=======
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
+
             });
         });
         
@@ -8815,7 +8673,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             observer.observe(panelDevolucion, { attributes: true, attributeFilter: ['style'] });
         }
-<<<<<<< HEAD
+
         } catch (error) {
             console.error('❌ Error al inicializar la aplicación:', error);
             console.error('Stack trace:', error.stack);
@@ -8971,54 +8829,7 @@ window.abrirModalFlota = abrirModalFlota;
 window.cerrarModales = cerrarModales;
 
 // =======================================================
-=======
-    } catch (error) {
-        console.error('❌ Error al inicializar la aplicación:', error);
-        console.error('Stack trace:', error.stack);
-        mostrarToast('Error al inicializar la aplicación. Ver consola.', 'error');
-    }
-    // === VINCULAR SERVICIO → SUBSERVICIO (para flujo directo) ===
-    const servicioSelect = document.getElementById('orden-servicio');
-    const subServicioSelect = document.getElementById('orden-sub');
 
-    if (servicioSelect && subServicioSelect) {
-        // Cargar servicios al inicio
-        if (Object.keys(appData.servicios).length > 0) {
-            populateSelect(servicioSelect, 
-                Object.keys(appData.servicios).map(s => ({ value: s, text: s })), 
-                "Seleccione Servicio"
-            );
-        }
-
-        // Listener para cargar subservicios al cambiar servicio
-        servicioSelect.addEventListener('change', function() {
-            cargarSubServicio(subServicioSelect, this);
-        });
-    }
-    setupRutListeners();
-
-    if (window.innerWidth <= 768) {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        if (sidebar) sidebar.classList.remove('active');
-        if (overlay) overlay.classList.remove('active');
-    }
-
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            const menuToggle = document.querySelector('.menu-toggle');
-            if (sidebar) sidebar.classList.remove('active');
-            if (overlay) overlay.classList.remove('active');
-            if (menuToggle) menuToggle.innerHTML = '☰';
-        }
-    });
-
-});
-
-// =======================================================
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
 // === GENERAR DECOS Y EXTENSORES AL CAMBIAR SUBSERVICIO ===
 // =======================================================
 document.getElementById('orden-sub')?.addEventListener('change', function() {
@@ -10801,7 +10612,6 @@ async function guardarUsuario(event) {
     renderListaUsuarios();
 }
 
-<<<<<<< HEAD
 // ================= FLOTA =================
 async function renderFlota(vista) {
     const tbody = document.getElementById(vista === 'km' ? 'tabla-flota-km' : vista === 'prox' ? 'tabla-flota-prox' : 'tabla-flota-actual');
@@ -11536,9 +11346,6 @@ window.renderPañol               = (cat) => window.PanolModule.renderPañol(cat
 
 console.log('✅ PanolModule cargado y expuesto globalmente');
 
-
-=======
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
 function renderListaUsuarios() {
     const contenedor = document.getElementById('lista-usuarios');
     if (!contenedor) return;
@@ -12210,24 +12017,6 @@ async function eliminarSerieDelSistemaSinRestricciones() {
     }
 }
 
-<<<<<<< HEAD
-=======
-
-/**
- * Habilita los campos del formulario según el tipo
- */
-
-// ================================
-// === DEVOLUCIÓN DE EQUIPOS -  ===
-// ================================
-// ============================================================
-// MÓDULO DEVOLUCIÓN DE EQUIPOS - REESCRITURA COMPLETA
-// Reemplaza las funciones: cambiarTipoDevolucion, habilitarCantidad,
-// generarCamposSeriesDevolucion, validarSerieDevolucion,
-// verificarCompletitudSeries, registrarDevolucion
-// ============================================================
-
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
 // ─── ESTADO GLOBAL DEL MÓDULO ───────────────────────────────
 const devolucionState = {
     nmalos: {
@@ -12240,8 +12029,6 @@ const devolucionState = {
         seriesIngresadas: []
     }
 };
-
-
 
 // ─── 2. RESET DE FORMULARIO ─────────────────────────────────
 function resetFormulario(tipo) {
@@ -13391,8 +13178,6 @@ function poblarFiltrosReporte() {
     actualizarEstadisticasHeader([]);
 }
 
-<<<<<<< HEAD
-=======
 // HACER FUNCIONES GLOBALES (para los onclick del HTML)
 window.aplicarFiltrosReporte = aplicarFiltrosReporte;
 window.limpiarFiltrosReporte = limpiarFiltrosReporte;
@@ -13400,8 +13185,6 @@ window.exportarReporteProduccion = exportarReporteProduccion;
 window.poblarFiltrosReporte = poblarFiltrosReporte;
 window.actualizarEstadisticasHeader = actualizarEstadisticasHeader;
 
-
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
 // === AGREGAR ORDENAMIENTO A LA TABLA ===
 
 /**
@@ -13549,20 +13332,6 @@ function filtrarTablaPorTecnico(nombreTecnico) {
     }
 }
 
-<<<<<<< HEAD
-=======
-
-// Animación suave para números
-
-
-// HACER FUNCIONES GLOBALES (para los onclick del HTML)
-window.aplicarFiltrosReporte = aplicarFiltrosReporte;
-window.limpiarFiltrosReporte = limpiarFiltrosReporte;
-window.exportarReporteProduccion = exportarReporteProduccion;
-window.poblarFiltrosReporte = poblarFiltrosReporte;
-
-
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
 /**
  * Elimina una serie asignada a un técnico, tanto del stock local como de Supabase.
  */
@@ -13737,27 +13506,6 @@ async function eliminarSerieDelSistemaUI() {
 // === ASIGNAR EVENTO AL BOTÓN ===
 document.getElementById('btn-eliminar-serie-sistema')?.addEventListener('click', eliminarSerieDelSistemaUI);
 
-<<<<<<< HEAD
-=======
-// ============================================
-// === EXPONER FUNCIONES AL SCOPE GLOBAL ===
-// ============================================
-window.cambiarTipoDevolucion = cambiarTipoDevolucion;
-window.habilitarCantidad = habilitarCantidad;
-window.cargarTecnicosDevolucion = cargarTecnicosDevolucion;
-window.generarCamposSeriesDevolucion = generarCamposSeriesDevolucion;
-window.validarSerieDevolucion = validarSerieDevolucion;
-window.registrarDevolucion = registrarDevolucion;
-window.confirmarReversaOrden = confirmarReversaOrden;
-window.marcarEnProceso = marcarEnProceso;
-window.cargarOrdenesReversaPendiente = cargarOrdenesReversaPendiente;
-window.abrirEdicionEmpleado = abrirEdicionEmpleado;
-window.editarEmpleado = abrirEdicionEmpleado; //
-window.renderBitacora = renderBitacora;
-window.limpiarFiltrosBitacora = limpiarFiltrosBitacora;
-
-
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
 async function renderBitacora() {
     const contenedor = document.getElementById('bitacora-contenido');
     if (!contenedor) return;
@@ -13911,7 +13659,6 @@ function cerrarSidebarSiEsMovil() {
         document.querySelector('.menu-toggle').innerHTML = '☰';
     }
 }
-<<<<<<< HEAD
 
 // [listener debug de clics eliminado - era para depuración temporal]
 
@@ -13938,6 +13685,3 @@ window.poblarFiltrosReporte = poblarFiltrosReporte;
 window.registrarDevolucion = registrarDevolucion;
 window.renderBitacora = renderBitacora;
 window.validarSerieDevolucion = validarSerieDevolucion;
-
-=======
->>>>>>> a9d8f0ba8b53b3a48520bb1834c350e35306df38
