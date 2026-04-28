@@ -1,6 +1,6 @@
 window.CONFIG = {
     supabase: {
-        url: 'https://jitosxhexlglzscjaiwy.supabase.co',
-        anonKey: 'sb_publishable_l0CMDg9fkuoDTaPsw69JKA_t_Pcvrac'
+        url: 'https://xljczdygdvuorpvisvcr.supabase.co',
+        anonKey: 'sb_publishable_LDeO0c4mIixQEsFSFU_Jkw_nwF8nWFN'
     }
 }
